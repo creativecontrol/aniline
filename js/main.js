@@ -23,10 +23,6 @@ $(function(){
           'https://storage.googleapis.com/download.magenta.tensorflow.org/tfjs_checkpoints/music_rnn/chord_pitches_improv'
         );
 
-        // Startup
-
-        setupMIDI();
-
         let machinePlayer = buildKeyboard(
           document.querySelector('.machine-bg .player')
         );
@@ -269,6 +265,11 @@ $(function(){
 
         })
     }
+
+// Startup
+
+    setupMIDI();
+
 
     Promise.all([rnn.initialize()])
            .then(generateDummySequence)
