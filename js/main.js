@@ -1,81 +1,60 @@
-$(function(){
-    var config = null;
-    var midi_output = null;
-    var midi_input = null;
-    console.log("internal JS loaded");
+$(function () {
+  var config = null;
+  var midi_output = null;
+  var midi_input = null;
+  console.log('internal JS loaded');
 
-    $.getJSON("/js/config.json", function(data){
-        console.log(data);
-        config = data;
-        startContext();
-    });
+  $.getJSON('/js/config.json', function (data) {
+    console.log(data);
+    config = data;
+    startContext();
+  });
 
-    function startContext() {
+  function startContext () {
+    const MIN_NOTE = 48;
+    const MAX_NOTE = 84;
+    const DEFAULT_BPM = 120;
+    const MAX_MIDI_BPM = 240;
+    const TEMPO_MIDI_CONTROLLER = 20; // Control changes for tempo for this controller id
 
-        const MIN_NOTE = 48;
-        const MAX_NOTE = 84;
-        const DEFAULT_BPM = 120;
-        const MAX_MIDI_BPM = 240;
-        const TEMPO_MIDI_CONTROLLER = 20; // Control changes for tempo for this controller id
+    let temperature = 1.1;
+    let patternLength = 8;
 
-        // Using the Improv RNN pretrained model from https://github.com/tensorflow/magenta/tree/master/magenta/models/improv_rnn
-        let rnn = new mm.MusicRNN(
-          'https://storage.googleapis.com/download.magenta.tensorflow.org/tfjs_checkpoints/music_rnn/chord_pitches_improv'
-        );
+    // Using the Improv RNN pretrained model from https://github.com/tensorflow/magenta/tree/master/magenta/models/improv_rnn
+    let rnn = new mm.MusicRNN(
+      'https://storage.googleapis.com/download.magenta.tensorflow.org/tfjs_checkpoints/music_rnn/chord_pitches_improv'
+    );
 
-        let machinePlayer = buildKeyboard(
-          document.querySelector('.machine-bg .player')
-        );
-        let humanPlayer = buildKeyboard(document.querySelector('.human-bg .player'));
-        let currentSeed = [];
-        let stopCurrentSequenceGenerator;
-        let synthsPlaying = {};
-        let currentPlayFn;
-        let tick = 0;
+    // let machinePlayer = buildKeyboard(
+    //   document.querySelector('.machine-bg .player')
+    // );
+    // let humanPlayer = buildKeyboard(document.querySelector('.human-bg .player'));
+    let currentSeed = [];
+    let stopCurrentSequenceGenerator;
+    // let synthsPlaying = {};
+    let pulsePattern = true;
+    let currentPlayFn;
+    let tick = 0;
 
-// pulled from original onActiveOutputChange
-        let outputs = {
-          config.midi_output: {
-            play: (note, velocity = 1, time, hold = false) => {
-              if (!hold) {
-                let delay = (time - Tone.now()) * 1000;
-                let duration = Tone.Time('16n').toMilliseconds();
-                output.playNote(note, 'all', {
-                  time: delay > 0 ? `+${delay}` : WebMidi.now,
-                  velocity,
-                  duration
-                });
-              }
-            },
-            stop: (note, time) => {
-              let delay = (time - Tone.now()) * 1000;
-              output.stopNote(note, 2, {
-                time: delay > 0 ? `+${delay}` : WebMidi.now
-              });
-            }
-          }
-        };
+    // ---------------------
 
-        let activeOutput = config.midi_output;
-//---------------------
+    function generateDummySequence () {
+      // Generate a throwaway sequence to get the RNN loaded so it doesn't
+      // cause jank later.
+      return rnn.continueSequence(
+        buildNoteSequence([{ note: 60, time: Tone.now() }]),
+        20,
+        temperature,
+        ['Cm']
+      );
+    }
 
-        function generateDummySequence() {
-          // Generate a throwaway sequence to get the RNN loaded so it doesn't
-          // cause jank later.
-          return rnn.continueSequence(
-            buildNoteSequence([{ note: 60, time: Tone.now() }]),
-            20,
-            temperature,
-            ['Cm']
-          );
-        }
-
-    function isAccidental(note) {
+    function isAccidental (note) {
       let pc = note % 12;
       return pc === 1 || pc === 3 || pc === 6 || pc === 8 || pc === 10;
     }
 
-    function detectChord(notes) {
+    function detectChord (notes) {
       notes = notes.map(n => Tonal.Note.pc(Tonal.Note.fromMidi(n.note))).sort();
       return Tonal.PcSet.modes(notes)
         .map((mode, i) => {
@@ -86,7 +65,7 @@ $(function(){
         .filter(x => x);
     }
 
-    function buildNoteSequence(seed) {
+    function buildNoteSequence (seed) {
       let step = 0;
       let delayProb = pulsePattern ? 0 : 0.3;
       let notes = seed.map(n => {
@@ -218,43 +197,69 @@ $(function(){
       // animateMachine(machinePlayer[note - MIN_NOTE]);
     }
 
-    function setupMIDI(){
-        // MIDI setup
+    function setupMIDI () {
+      // MIDI setup
 
-        WebMidi.enable(err => {
-          if (err) {
-            // using more extensive error messaging to pass back to NodeJS
-            console.error('WebMidi could not be enabled', err.name, err.message);
-            return;
-          }
-          console.log('WebMidi loaded successfully');
-          midi_input = WebMidi.inputs[0];
-          midi_output = WebMidi.outputs[0];
+      WebMidi.enable(err => {
+        if (err) {
+          // using more extensive error messaging to pass back to NodeJS
+          console.error('WebMidi could not be enabled', err.name, err.message);
+          return;
+        }
+        console.log('WebMidi loaded successfully');
+        console.log(WebMidi.inputs);
+        console.log(WebMidi.outputs);
+        midi_input = WebMidi.inputs[0];
+        midi_output = WebMidi.outputs[0];
 
-          if (midi_input) {
-            midi_input.addListener('noteon', 1, e => {
-              humanKeyDown(e.note.number, e.velocity);
-              //hideUI();
-            });
-            midi_input.addListener('controlchange', 1, e => {
-              if (e.controller.number === TEMPO_MIDI_CONTROLLER) {
-                Tone.Transport.bpm.value = (e.value / 128) * MAX_MIDI_BPM;
-                echo.delayTime.value = Tone.Time('8n.').toSeconds();
-              }
-            });
-            midi_input.addListener('noteoff', 1, e => humanKeyUp(e.note.number));
-            // for (let option of Array.from(inputSelector.children)) {
-            //   option.selected = option.value === id;
-            // }
-            // activeInput = input;
-          }
+        if (midi_input) {
+          midi_input.addListener('noteon', 1, e => {
+            humanKeyDown(e.note.number, e.velocity);
+            // hideUI();
+          });
+          midi_input.addListener('controlchange', 1, e => {
+            if (e.controller.number === TEMPO_MIDI_CONTROLLER) {
+              Tone.Transport.bpm.value = (e.value / 128) * MAX_MIDI_BPM;
+              // echo.delayTime.value = Tone.Time('8n.').toSeconds();
+            }
+          });
+          midi_input.addListener('noteoff', 1, e => humanKeyUp(e.note.number));
+          // for (let option of Array.from(inputSelector.children)) {
+          //   option.selected = option.value === id;
+          // }
+          // activeInput = input;
+        }
 
-        })
+      })
     }
-
-// Startup
+    // Startup
 
     setupMIDI();
+
+    // pulled from original onActiveOutputChange
+      let outputs = {
+        internal: {
+          play: (note, velocity = 1, time, hold = false) => {
+            if (!hold) {
+              let delay = (time - Tone.now()) * 1000;
+              let duration = Tone.Time('16n').toMilliseconds();
+              output.playNote(note, 'all', {
+                time: delay > 0 ? `+${delay}` : WebMidi.now,
+                velocity,
+                duration
+              });
+            }
+          },
+          stop: (note, time) => {
+            let delay = (time - Tone.now()) * 1000;
+            output.stopNote(note, 2, {
+              time: delay > 0 ? `+${delay}` : WebMidi.now
+            });
+          }
+        }
+      };
+
+      let activeOutput = config.midi_output;
 
 
     Promise.all([rnn.initialize()])
@@ -265,8 +270,10 @@ $(function(){
            });
 
    StartAudioContext(Tone.context, document.documentElement);
+  }
 
 })
+
 
 // document.querySelector('#play').addEventListener('click', function() {
 //     Tone.Transport.bpm.value = 80;
@@ -279,3 +286,4 @@ $(function(){
 // }, ["C4", "E4", "G4", "A4"], "4n");
 // seq.loop = true;
 // seq.start();
+
