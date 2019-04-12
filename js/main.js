@@ -74,19 +74,19 @@ $(function(){
           );
         }
 
-        let bufferLoadPromise = new Promise(res => Tone.Buffer.on('load', res));
-        Promise.all([bufferLoadPromise, rnn.initialize()])
-          .then(generateDummySequence)
-          .then(() => {
-            Tone.Transport.start();
-            Tone.Transport.bpm.value = DEFAULT_BPM;
-            onScreenKeyboardContainer.classList.add('loaded');
-            document.querySelector('.loading').remove();
-          });
+//         let bufferLoadPromise = new Promise(res => Tone.Buffer.on('load', res));
+//         Promise.all([bufferLoadPromise, rnn.initialize()])
+//           .then(generateDummySequence)
+//           .then(() => {
+//             Tone.Transport.start();
+//             Tone.Transport.bpm.value = DEFAULT_BPM;
+//             onScreenKeyboardContainer.classList.add('loaded');
+//             document.querySelector('.loading').remove();
+//           });
 
-        StartAudioContext(Tone.context, document.documentElement);
+//         StartAudioContext(Tone.context, document.documentElement);
 
-    }
+//     }
 
     function isAccidental(note) {
       let pc = note % 12;
@@ -269,6 +269,16 @@ $(function(){
 
         })
     }
+
+    Promise.all([rnn.initialize()])
+           .then(generateDummySequence)
+           .then(() => {
+             Tone.Transport.start();
+             Tone.Transport.bpm.value = DEFAULT_BPM;
+           });
+
+   StartAudioContext(Tone.context, document.documentElement);
+
 })
 
 // document.querySelector('#play').addEventListener('click', function() {
