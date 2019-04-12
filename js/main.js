@@ -70,20 +70,6 @@ $(function(){
           );
         }
 
-//         let bufferLoadPromise = new Promise(res => Tone.Buffer.on('load', res));
-//         Promise.all([bufferLoadPromise, rnn.initialize()])
-//           .then(generateDummySequence)
-//           .then(() => {
-//             Tone.Transport.start();
-//             Tone.Transport.bpm.value = DEFAULT_BPM;
-//             onScreenKeyboardContainer.classList.add('loaded');
-//             document.querySelector('.loading').remove();
-//           });
-
-//         StartAudioContext(Tone.context, document.documentElement);
-
-//     }
-
     function isAccidental(note) {
       let pc = note % 12;
       return pc === 1 || pc === 3 || pc === 6 || pc === 8 || pc === 10;
@@ -211,7 +197,7 @@ $(function(){
       for (let { note, velocity } of humanKeyAdds) {
         outputs[activeOutput].play(note, velocity, time, true);
         humanPlayer[note - MIN_NOTE].classList.add('down');
-        animatePlay(onScreenKeyboard[note - MIN_NOTE], note, true);
+//         animatePlay(onScreenKeyboard[note - MIN_NOTE], note, true);
       }
       for (let { note } of humanKeyRemovals) {
         outputs[activeOutput].stop(note, time);
