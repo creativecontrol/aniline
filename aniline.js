@@ -71,7 +71,7 @@ function startBrowser(_port) {
 
       console.log("opened");
 
-      process.on('SIGINT', function() {
+      process.on('SIGINT', async function() {
   	await browser.close();
   	process.exit();
       });
