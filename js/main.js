@@ -174,11 +174,13 @@ $(function () {
     function applyHumanKeyChanges(time = Tone.now()) {
       if (humanKeyAdds.length == 0 && humanKeyRemovals.length == 0) return;
       for (let { note, velocity } of humanKeyAdds) {
+        console.log('play output ' + note + ' ' + time);
         outputs[activeOutput].play(note, velocity, time, true);
         humanPlayer[note - MIN_NOTE].classList.add('down');
 //         animatePlay(onScreenKeyboard[note - MIN_NOTE], note, true);
       }
       for (let { note } of humanKeyRemovals) {
+        console.log('stop output ' + note + ' ' + time);
         outputs[activeOutput].stop(note, time);
         humanPlayer[note - MIN_NOTE].classList.remove('down');
       }
@@ -192,6 +194,7 @@ $(function () {
 
     function machineKeyDown(note, time) {
       if (note < MIN_NOTE || note > MAX_NOTE) return;
+      console.log('play output ' + note + ' ' + time);
       outputs[activeOutput].play(note, 0.7, time);
       // animatePlay(onScreenKeyboard[note - MIN_NOTE], note, false);
       // animateMachine(machinePlayer[note - MIN_NOTE]);
