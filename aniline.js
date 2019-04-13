@@ -16,6 +16,7 @@ const fs = require('fs');
 const util = require('util');
 const path = require('path');
 const express = require('express');
+const process = require('process');
 
 /**
 * Start a static web server for serving the project site to puppeteer.
@@ -69,9 +70,13 @@ function startBrowser(_port) {
       });
 
       console.log("opened");
-      setTimeout(function(){console.log("close")}, 15000);
 
-      await browser.close();
+      process.on('SIGINT', function() {
+  	await browser.close();
+  	process.exit();
+      });
+
+      
     })();
 }
 
