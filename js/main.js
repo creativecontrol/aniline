@@ -39,6 +39,7 @@ $(function () {
     // ---------------------
 
     function generateDummySequence () {
+      console.log('dummy sequence generating');
       // Generate a throwaway sequence to get the RNN loaded so it doesn't
       // cause jank later.
       return rnn.continueSequence(
@@ -164,10 +165,12 @@ $(function () {
     let humanKeyAdds = [],
       humanKeyRemovals = [];
     function humanKeyDown(note, velocity = 0.7) {
+      console.log('key down ' + note);
       if (note < MIN_NOTE || note > MAX_NOTE) return;
       humanKeyAdds.push({ note, velocity });
     }
     function humanKeyUp(note) {
+      console.log('key up ' + note);
       if (note < MIN_NOTE || note > MAX_NOTE) return;
       humanKeyRemovals.push({ note });
     }
@@ -212,10 +215,13 @@ $(function () {
         console.log('WebMidi loaded successfully');
         console.log(WebMidi.inputs);
         console.log(WebMidi.outputs);
-        midi_input = WebMidi.inputs[0];
-        midi_output = WebMidi.outputs[0];
+        
+	// midi_input = WebMidi.inputs[0];
+       midi_input = WebMidi.getInputByName(config.midiInput); 
+       midi_output = WebMidi.outputs[0];
 
         if (midi_input) {
+         console.log("midi input event setup");
           midi_input.addListener('noteon', 1, e => {
             humanKeyDown(e.note.number, e.velocity);
             // hideUI();
@@ -236,6 +242,14 @@ $(function () {
       })
     }
     // Startup
+
+	document.querySelector('#play').addEventListener('click', function() {
+	// Tone.Transport.bpm.value = 80;
+     	// Tone.Transport.start();
+		console.log('Tone AudioContext resuming');
+           Tone.context.resume();
+	 });
+
 
     setupMIDI();
 
@@ -262,7 +276,7 @@ $(function () {
         }
       };
 
-      let activeOutput = config.midi_output;
+      let activeOutput = 'internal';
 
 
     Promise.all([rnn.initialize()])
@@ -278,10 +292,6 @@ $(function () {
 })
 
 
-// document.querySelector('#play').addEventListener('click', function() {
-//     Tone.Transport.bpm.value = 80;
-//     Tone.Transport.start();
-// });
 
 // var seq = new Tone.Sequence(function(time, note){
 // console.log(note);

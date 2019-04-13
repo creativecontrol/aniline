@@ -1,6 +1,6 @@
 {
-    "midi_input": 0,
-    "midi_input_channel": 0,
+    "midiInput": "nanoKEY2 MIDI 1",
+    "midiInputChannel": 0,
     "midi_output": "IAC Driver IAC Bus 1",
     "midi_output_channel": 0
 }
