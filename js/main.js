@@ -1,7 +1,7 @@
 $(function () {
   var config = null;
-  var midi_output = null;
-  var midi_input = null;
+  var midiOutput = null;
+  var midiInput = null;
   console.log('internal JS loaded');
 
   $.getJSON('/js/config.json', function (data) {
@@ -179,13 +179,13 @@ $(function () {
       for (let { note, velocity } of humanKeyAdds) {
         console.log('play output ' + note + ' ' + time);
         outputs[activeOutput].play(note, velocity, time, true);
-        humanPlayer[note - MIN_NOTE].classList.add('down');
+        // humanPlayer[note - MIN_NOTE].classList.add('down');
 //         animatePlay(onScreenKeyboard[note - MIN_NOTE], note, true);
       }
       for (let { note } of humanKeyRemovals) {
         console.log('stop output ' + note + ' ' + time);
         outputs[activeOutput].stop(note, time);
-        humanPlayer[note - MIN_NOTE].classList.remove('down');
+        // humanPlayer[note - MIN_NOTE].classList.remove('down');
       }
       updateChord({
         add: humanKeyAdds.map(n => n.note),
@@ -215,29 +215,40 @@ $(function () {
         console.log('WebMidi loaded successfully');
         console.log(WebMidi.inputs);
         console.log(WebMidi.outputs);
-        
-	// midi_input = WebMidi.inputs[0];
-       midi_input = WebMidi.getInputByName(config.midiInput); 
-       midi_output = WebMidi.outputs[0];
 
-        if (midi_input) {
+        let activeInput,
+          activeClockInputId,
+          activeClockOutputId,
+          transportTickerId,
+          clockOutputTickerId,
+          midiTickCount,
+          lastBeatAt;
+
+
+	// midi_input = WebMidi.inputs[0];
+       midiInput = WebMidi.getInputByName(config.midiInput);
+       midiOutput = WebMidi.getOutputByName(config.midiOutput);
+
+        if (midiInput) {
          console.log("midi input event setup");
-          midi_input.addListener('noteon', 1, e => {
+          midiInput.addListener('noteon', 1, e => {
             humanKeyDown(e.note.number, e.velocity);
             // hideUI();
           });
-          midi_input.addListener('controlchange', 1, e => {
+          midiInput.addListener('controlchange', 1, e => {
             if (e.controller.number === TEMPO_MIDI_CONTROLLER) {
               Tone.Transport.bpm.value = (e.value / 128) * MAX_MIDI_BPM;
               // echo.delayTime.value = Tone.Time('8n.').toSeconds();
             }
           });
-          midi_input.addListener('noteoff', 1, e => humanKeyUp(e.note.number));
+          midiInput.addListener('noteoff', 1, e => humanKeyUp(e.note.number));
           // for (let option of Array.from(inputSelector.children)) {
           //   option.selected = option.value === id;
           // }
           // activeInput = input;
         }
+
+        transportTickerId = Tone.Transport.scheduleRepeat(doTick, '8n');
 
       })
     }
@@ -260,7 +271,7 @@ $(function () {
             if (!hold) {
               let delay = (time - Tone.now()) * 1000;
               let duration = Tone.Time('16n').toMilliseconds();
-              output.playNote(note, 'all', {
+              midiOutput.playNote(note, 'all', {
                 time: delay > 0 ? `+${delay}` : WebMidi.now,
                 velocity,
                 duration
@@ -269,7 +280,7 @@ $(function () {
           },
           stop: (note, time) => {
             let delay = (time - Tone.now()) * 1000;
-            output.stopNote(note, 2, {
+            midiOutput.stopNote(note, 2, {
               time: delay > 0 ? `+${delay}` : WebMidi.now
             });
           }
@@ -299,4 +310,3 @@ $(function () {
 // }, ["C4", "E4", "G4", "A4"], "4n");
 // seq.loop = true;
 // seq.start();
-
