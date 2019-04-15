@@ -1,0 +1,27 @@
+{
+  "name": "aniline",
+  "version": "0.1.0",
+  "description": "electron app for using neural arpeggiator",
+  "main": "aniline.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creativecontrol/aniline.git"
+  },
+  "author": "creativecontrol",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/creativecontrol/aniline/issues"
+  },
+  "homepage": "https://github.com/creativecontrol/aniline#readme",
+  "devDependencies": {
+    "electron": "^4.1.4"
+  },
+  "dependencies": {
+    "jquery": "^3.4.0",
+    "startaudiocontext": "^1.2.1",
+    "webmidi": "^2.3.3"
+  }
+}

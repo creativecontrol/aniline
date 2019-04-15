@@ -1,12 +1,15 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
     <head>
         <meta charset="utf-8">
-        <!--<script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.7.0/dist/magentamusic.min.js"></script>-->
-        <script src="js/jquery-3.3.1.min.js"></script>
-        <script src="js/webmidi.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+        <!-- <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.7.0/dist/magentamusic.min.js"></script>-->
+
+        <script>window.$ = window.jQuery = require('jquery');</script>
+        <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+        <script>window.WebMidi = require('webmidi');</script>
         <script src="js/lodash.min.js"></script>
-        <script src="js/StartAudioContext.min.js"></script>
+        <script>window.StartAudioContext = require('startaudiocontext');</script>
         <script src="js/tonal.min.js"></script>
         <script src="js/Tone.js"></script>
         <script src="js/magentamusic.min.js"></script>
@@ -14,12 +17,51 @@
 
         <title></title>
     </head>
-    <script type="text/javascript">
-        console.log("log on index page");
-
-    </script>
     <body>
-        <button type="button" name="button" id="play"></button>
+    <header class=" mdc-top-app-bar mdc-top-app-bar--short">
+        <div class="mdc-top-app-bar__row">
+            <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                <span class="mdc-top-app-bar__title">aniline</span> </section>
+                <span class="mdc-top-app-bar__subtitle">aniline</span> </section>
+        </div>
+    </header>
+        <div id="title">aniline</div>
+        <div id="subtitle">arpeggiator</div>
+
+    <div class="mdc-select">
+    <select id="pattern-length" class="mdc-select__native-control" role="presentation">
+        <option>4</option>
+        <option selected>8</option>
+        <option>16</option>
+        <option>32</option>
+      </select>
+    </div>
+
+    <div>
+      MIDI input
+      <div class="mdc-select">
+        <select id="midi-inputs" class="mdc-select__native-control" role="presentation"></select>
+        <div class="mdc-select__bottom-line"></div>
+      </div>
+      Clock input
+      <div class="mdc-select">
+        <select id="midi-clock-inputs" class="mdc-select__native-control" role="presentation"></select>
+        <div class="mdc-select__bottom-line"></div>
+      </div>
+    </div>
+    <div>
+      Output
+      <div class="mdc-select">
+        <select id="outputs" class="mdc-select__native-control" role="presentation"></select>
+        <div class="mdc-select__bottom-line"></div>
+      </div>
+      Clock Output
+      <div class="mdc-select">
+        <select id="midi-clock-outputs" class="mdc-select__native-control" role="presentation"></select>
+        <div class="mdc-select__bottom-line"></div>
+      </div>
+    </div>
+    </div>
 
     </body>
 </html>

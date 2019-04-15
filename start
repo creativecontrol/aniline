@@ -1,0 +1,8 @@
+{
+  "name": "Aniline",
+  "version": "0.1.0",
+  "main": "aniline.js",
+  "scripts": {
+    "start": "node ."
+  }
+}

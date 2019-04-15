@@ -1,83 +1,42 @@
 /**
-* @fileoverview Aniline implements Magenta improvisation algorithms thorugh the JS Web context.
-* The intent is to run this on an UP Board.
-* This is done by running Puppeteer to control a headless browser to reduce the
-* overhead of running a GUI. This may prove an issue as the GPU may be needed
-* for Magenta operation.
-* Python and directly running Magenta in NodeJS but these were not deemed feasible.
-* Python requires the entire installation of Magenta which is not currently compatible
-* with Raspberry Pi.
-* NodeJS (using TypeScript) has issues finding the WebMidi context required for
-* Magenta to be used.
+* @fileoverview Aniline implements Magenta improvisation algorithms using Electron.
+* The currently available Electron apps from the Magenta team are not real-time.
+* This is an effort to make the systems available for real-time preformance use.
 */
 
-const puppeteer = require('puppeteer');
-const fs = require('fs');
-const util = require('util');
-const path = require('path');
-const express = require('express');
-const process = require('process');
+const {app, BrowserWindow} = require('electron');
 
-/**
-* Start a static web server for serving the project site to puppeteer.
-* This will serve the HTML and static JS files.
-* @param {int} _port
-*/
-function startWebServer(_port) {
+function createWindow () {
+    let win =  new BrowserWindow({width:300, height:500});
 
-    const app = express();
+    win.loadFile('index.html');
 
-    var port = _port;
+    // win.webContents.openDevTools();
 
-    // viewed at http://localhost:8080
-    app.get('/', function(req, res) {
-        res.sendFile(path.join(__dirname + '/index.html'));
+    // Emitted when the window is closed.
+    win.on('closed', () => {
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    win = null
     });
-    app.use(express.static('./'))
-    app.listen(port);
-    console.log(`http://localhost:${port}`);
 }
 
-/**
-* Open a headless Chromium browser using puppeteer
-* @param {int} _port
-*/
-function startBrowser(_port) {
-    var port = _port;
+app.on('ready', createWindow);
 
-    startWebServer(port);
+// Quit when all windows are closed.
+app.on('window-all-closed', () => {
+  // On macOS it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
 
-    (async () => {
-      const browser = await puppeteer.launch({
-        ignoreDefaultArgs: ['--mute-audio', '--disable-gpu'],
-        enableAudio: true,
-	headless: false,
-      });
-      // recommended way to allow MIDI permissions for a page as per
-      // https://github.com/GoogleChrome/puppeteer/issues/2973
-      await browser.defaultBrowserContext().overridePermissions(`http://localhost:${port}`, ['midi']);
-      const page = await browser.newPage();
-      // page.on('console', (log) => console[log._type](log._text));
-      page.on('console', msg => {
-          for (let i = 0; i < msg.args().length; ++i)
-            console.log(`${i}: ${msg.args()[i]}`);
-        });
-      await page.goto(`http://localhost:${port}`);
-      await page.click('#play',{
-            button: 'left', //left, right, middle,
-            clickCount: 1,
-            delay: 200 //how long to hold down the mouse button
-      });
-
-      console.log("opened");
-
-      process.on('SIGINT', async function() {
-  	await browser.close();
-  	process.exit();
-      });
-
-      
-    })();
-}
-
-startBrowser(3000);
+app.on('activate', () => {
+  // On macOS it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (win === null) {
+    createWindow();
+  }
+});
