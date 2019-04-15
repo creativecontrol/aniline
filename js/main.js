@@ -229,6 +229,10 @@ $(function () {
        midiInput = WebMidi.getInputByName(config.midiInput);
        midiOutput = WebMidi.getOutputByName(config.midiOutput);
 
+        console.log(midiInput);
+        console.log(midiOutput);
+
+
         if (midiInput) {
          console.log("midi input event setup");
           midiInput.addListener('noteon', 1, e => {
