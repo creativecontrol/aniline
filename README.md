@@ -1,4 +1,8 @@
 # aniline
+
+![alt text](https://raw.githubusercontent.com/creativecontrol/aniline/master/aniline_arpeggiator_main.png)
+![alt text](https://raw.githubusercontent.com/creativecontrol/aniline/master/aniline_arpeggiator_settings.png)
+
 Aniline implements Magenta improvisation algorithms using Electron.
 The currently available Electron apps from the Magenta team are not real-time.
 This is an effort to make the Magenta processes available for real-time preformance use.
