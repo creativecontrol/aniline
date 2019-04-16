@@ -18,6 +18,9 @@ hr {
     border-color: #12e5ed;
 }
 
+body {
+  overflow-x: hidden;
+}
 
 .mdc-select {
     border-radius: 30px;
