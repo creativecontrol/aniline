@@ -1,0 +1,83 @@
+:root {
+    --mdc-theme-primary: #333333;
+    --mdc-theme-background: #000;
+    --mdc-theme-secondary: #12e5ed;
+    --mdc-theme-on-primary: #DCDCDC;
+    --mdc-theme-on-secondary: #DCDCDC;
+}
+
+:not(input):not(textarea),
+:not(input):not(textarea)::after,
+:not(input):not(textarea)::before {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+hr {
+    border-color: #12e5ed;
+}
+
+
+.mdc-select {
+    border-radius: 30px;
+    width: 300px;
+    border:none;
+    border-width: 0px;
+}
+
+.mdc-select__native-control {
+    border-bottom: none;
+}
+
+.mdc-select__native-control:hover {
+    border-bottom: none;
+}
+
+#settings-icon {
+    position:fixed;
+    right:1rem;
+    top:1rem;
+}
+
+.settings {
+
+}
+
+.rounded {
+
+}
+
+.appHeader {
+    -webkit-app-region: drag;
+}
+
+.center {
+    text-align: center;
+}
+
+#clock {
+    position: fixed;
+    width:100px;
+    bottom: 60px;
+    left: 50%;
+    margin-left: -50px;
+}
+#clock.mdc-icon-button:disabled {
+    color: #6d6d6d;
+}
+
+#main-page {
+}
+#settings-controls {
+    align-items: right;
+}
+
+.cc-logo {
+    position:fixed;
+    width: 200px;
+    left: 50%;
+    margin-left: -100px;
+    color: #FFD700;
+    bottom: 1rem;
+}

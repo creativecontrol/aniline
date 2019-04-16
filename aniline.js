@@ -6,8 +6,27 @@
 
 const {app, BrowserWindow} = require('electron');
 
+
 function createWindow () {
-    let win =  new BrowserWindow({width:300, height:500});
+    // Deployment Config
+    let win =  new BrowserWindow({width:300,
+        height:500,
+        titleBarStyle:'hidden',
+        fullscreenable:false,
+        maximizable:false,
+        resizable:false,
+        moveable:true
+    });
+
+    // Debug Config
+    // let win =  new BrowserWindow({
+    //     width:300,
+    //     height:500,
+    //     titleBarStyle:'hidden',
+    //     fullscreenable:false,
+    //     maximizable:false,
+    //     moveable:true
+    // });
 
     win.loadFile('index.html');
 
@@ -21,6 +40,8 @@ function createWindow () {
     win = null
     });
 }
+
+
 
 app.on('ready', createWindow);
 

@@ -2,13 +2,13 @@ $(function () {
   var config = null;
   var midiOutput = null;
   var midiInput = null;
+  var settingPageVisible = false;
   console.log('internal JS loaded');
 
-  // $.getJSON('/js/config.json', function (data) {
-  //   console.log(data);
-  //   config = data;
-  //
-  // });
+  $('#settings-icon').click( function () {
+     $('#main-page').toggle();
+     $('#settings-controls').toggle();
+  });
 
   function startContext () {
     const MIN_NOTE = 48;
@@ -19,6 +19,7 @@ $(function () {
 
     let temperature = 1.1;
     let patternLength = 8;
+    let density = 90.0;
 
     // Using the Improv RNN pretrained model from https://github.com/tensorflow/magenta/tree/master/magenta/models/improv_rnn
     let rnn = new mm.MusicRNN(
@@ -35,6 +36,9 @@ $(function () {
     let pulsePattern = true;
     let currentPlayFn;
     let tick = 0;
+    let midiClockIconOnTicks = 5;
+    let midiClockOnColor = "#12e5ed";
+    let midiClockOffColor = "#6d6d6d";
 
     // ---------------------
 
@@ -49,6 +53,25 @@ $(function () {
         ['Cm']
       );
     }
+
+    // Temperature control
+
+    let tempSlider = new mdc.slider.MDCSlider(
+      document.querySelector('#temperature')
+    );
+    tempSlider.listen('MDCSlider:change', () => (temperature = tempSlider.value));
+
+    // Pattern length
+    document
+      .querySelector('#pattern-length')
+      .addEventListener('change', evt => (patternLength = evt.target.value));
+
+    // Density control
+    let densitySlider = new mdc.slider.MDCSlider(
+    document.querySelector('#density')
+    );
+    densitySlider.listen('MDCSlider:change', () => (density = densitySlider.value));
+
 
     let outputs = {
       internal: {
@@ -207,10 +230,17 @@ $(function () {
       humanKeyRemovals.length = 0;
     }
 
+    function setDensity (vel) {
+        let rand = Math.random();
+        return (rand <= density * 0.01) ? vel : 0;
+    }
+
     function machineKeyDown(note, time) {
       if (note < MIN_NOTE || note > MAX_NOTE) return;
       console.log('play output ' + note + ' ' + time);
-      outputs[activeOutput].play(note, 0.7, time);
+      let velocityDensity = setDensity(0.7);
+      console.log("vel den: " + velocityDensity);
+      outputs[activeOutput].play(note, velocityDensity, time);
       // animatePlay(onScreenKeyboard[note - MIN_NOTE], note, false);
       // animateMachine(machinePlayer[note - MIN_NOTE]);
     }
@@ -335,12 +365,12 @@ $(function () {
          if (input) {
            input.addListener('noteon', 1, e => {
              humanKeyDown(e.note.number, e.velocity);
-             hideUI();
+             // hideUI();
            });
            input.addListener('controlchange', 1, e => {
              if (e.controller.number === TEMPO_MIDI_CONTROLLER) {
                Tone.Transport.bpm.value = (e.value / 128) * MAX_MIDI_BPM;
-               echo.delayTime.value = Tone.Time('8n.').toSeconds();
+               // echo.delayTime.value = Tone.Time('8n.').toSeconds();
              }
            });
            input.addListener('noteoff', 1, e => humanKeyUp(e.note.number));
@@ -428,13 +458,18 @@ $(function () {
              let beatDur = evt.timestamp - lastBeatAt;
              Tone.Transport.bpm.value = Math.round(60000 / beatDur);
              // Not sure why this doesn't sync through the BPM automatically. But it doesn't.
-             echo.delayTime.value = Tone.Time('8n.').toSeconds();
+             // echo.delayTime.value = Tone.Time('8n.').toSeconds();
            }
            lastBeatAt = evt.timestamp;
+           // turn on clock icon
+           $('#clock').css({color: midiClockOnColor});
+         }
+         if (midiTickCount % 24 === midiClockIconOnTicks) {
+            $('#clock').css({color: midiClockOffColor});
          }
          if (midiTickCount % 12 === 0) {
            doTick();
-         }
+       }
          midiTickCount++;
        }
 
