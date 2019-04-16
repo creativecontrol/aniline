@@ -1,3 +1,6 @@
+/*
+* Aniline Arpeggiator.
+*/
 $(function () {
   var config = null;
   var midiOutput = null;
@@ -5,9 +8,9 @@ $(function () {
   var settingPageVisible = false;
   console.log('internal JS loaded');
 
-  $('#settings-icon').click( function () {
-     $('#main-page').toggle();
-     $('#settings-controls').toggle();
+  $('#settings-icon').click(function () {
+    $('#main-page').toggle();
+    $('#settings-controls').toggle();
   });
 
   function startContext () {
@@ -26,36 +29,16 @@ $(function () {
       'https://storage.googleapis.com/download.magenta.tensorflow.org/tfjs_checkpoints/music_rnn/chord_pitches_improv'
     );
 
-    // let machinePlayer = buildKeyboard(
-    //   document.querySelector('.machine-bg .player')
-    // );
-    // let humanPlayer = buildKeyboard(document.querySelector('.human-bg .player'));
     let currentSeed = [];
     let stopCurrentSequenceGenerator;
-    // let synthsPlaying = {};
     let pulsePattern = true;
     let currentPlayFn;
     let tick = 0;
     let midiClockIconOnTicks = 5;
-    let midiClockOnColor = "#12e5ed";
-    let midiClockOffColor = "#6d6d6d";
-
-    // ---------------------
-
-    function generateDummySequence () {
-      console.log('dummy sequence generating');
-      // Generate a throwaway sequence to get the RNN loaded so it doesn't
-      // cause jank later.
-      return rnn.continueSequence(
-        buildNoteSequence([{ note: 60, time: Tone.now() }]),
-        20,
-        temperature,
-        ['Cm']
-      );
-    }
+    let midiClockOnColor = '#12e5ed';
+    let midiClockOffColor = '#6d6d6d';
 
     // Temperature control
-
     let tempSlider = new mdc.slider.MDCSlider(
       document.querySelector('#temperature')
     );
@@ -68,18 +51,15 @@ $(function () {
 
     // Density control
     let densitySlider = new mdc.slider.MDCSlider(
-    document.querySelector('#density')
+      document.querySelector('#density')
     );
     densitySlider.listen('MDCSlider:change', () => (density = densitySlider.value));
-
 
     let outputs = {
       internal: {
         play: (note, velocity, time, hold = false) => {
-
         },
         stop: (note, time) => {
-
         }
       }
     };
@@ -123,7 +103,7 @@ $(function () {
       };
     }
 
-    function seqToTickArray(seq) {
+    function seqToTickArray (seq) {
       return _.flatMap(seq.notes, n =>
         [n.pitch].concat(
           pulsePattern
@@ -133,15 +113,14 @@ $(function () {
       );
     }
 
-    function doTick(time = Tone.now() - Tone.context.lookAhead) {
+    function doTick (time = Tone.now() - Tone.context.lookAhead) {
       applyHumanKeyChanges(time);
       if (currentPlayFn) currentPlayFn(time);
     }
 
-    function startSequenceGenerator(seed) {
-      let running = true,
-        thisPatternLength = patternLength;
-
+    function startSequenceGenerator (seed) {
+      let running = true;
+      let thisPatternLength = patternLength;
       let chords = detectChord(seed);
       let chord =
         _.first(chords) ||
@@ -150,7 +129,7 @@ $(function () {
       let generatedSequence = seqToTickArray(seedSeq);
       let playIntervalTime = Tone.Time('8n').toSeconds();
       let generationIntervalTime = playIntervalTime / 2;
-      function generateNext() {
+      function generateNext () {
         if (!running) return;
         if (generatedSequence.length < thisPatternLength) {
           rnn.continueSequence(seedSeq, 20, temperature, [chord]).then(genSeq => {
@@ -178,7 +157,7 @@ $(function () {
       };
     }
 
-    function updateChord({ add = [], remove = [] }) {
+    function updateChord ({ add = [], remove = [] }) {
       for (let note of add) {
         currentSeed.push({ note, time: Tone.now() });
       }
@@ -197,28 +176,27 @@ $(function () {
       }
     }
 
-    let humanKeyAdds = [],
-      humanKeyRemovals = [];
-    function humanKeyDown(note, velocity = 0.7) {
-      console.log('key down ' + note);
+    let humanKeyAdds = [];
+    let humanKeyRemovals = [];
+
+    function humanKeyDown (note, velocity = 0.7) {
+      console.debug('key down ' + note);
       if (note < MIN_NOTE || note > MAX_NOTE) return;
       humanKeyAdds.push({ note, velocity });
     }
-    function humanKeyUp(note) {
-      console.log('key up ' + note);
+    function humanKeyUp (note) {
+      console.debug('key up ' + note);
       if (note < MIN_NOTE || note > MAX_NOTE) return;
       humanKeyRemovals.push({ note });
     }
-    function applyHumanKeyChanges(time = Tone.now()) {
-      if (humanKeyAdds.length == 0 && humanKeyRemovals.length == 0) return;
+    function applyHumanKeyChanges (time = Tone.now()) {
+      if (humanKeyAdds.length === 0 && humanKeyRemovals.length === 0) return;
       for (let { note, velocity } of humanKeyAdds) {
-        console.log('play output ' + note + ' ' + time);
+        console.debug('play output ' + note + ' ' + time);
         outputs[activeOutput].play(note, velocity, time, true);
-        // humanPlayer[note - MIN_NOTE].classList.add('down');
-//         animatePlay(onScreenKeyboard[note - MIN_NOTE], note, true);
       }
       for (let { note } of humanKeyRemovals) {
-        console.log('stop output ' + note + ' ' + time);
+        console.debug('stop output ' + note + ' ' + time);
         outputs[activeOutput].stop(note, time);
         // humanPlayer[note - MIN_NOTE].classList.remove('down');
       }
@@ -231,23 +209,31 @@ $(function () {
     }
 
     function setDensity (vel) {
-        let rand = Math.random();
-        return (rand <= density * 0.01) ? vel : 0;
+      let rand = Math.random();
+      return (rand <= density * 0.01) ? vel : 0;
     }
 
-    function machineKeyDown(note, time) {
+    function machineKeyDown (note, time) {
       if (note < MIN_NOTE || note > MAX_NOTE) return;
-      console.log('play output ' + note + ' ' + time);
+      console.debug('play output ' + note + ' ' + time);
       let velocityDensity = setDensity(0.7);
-      console.log("vel den: " + velocityDensity);
+      console.debug('vel den: ' + velocityDensity);
       outputs[activeOutput].play(note, velocityDensity, time);
-      // animatePlay(onScreenKeyboard[note - MIN_NOTE], note, false);
-      // animateMachine(machinePlayer[note - MIN_NOTE]);
+    }
+
+    function generateDummySequence () {
+      console.log('dummy sequence generating');
+      // Generate a throwaway sequence to get the RNN loaded so it doesn't
+      // cause jank later.
+      return rnn.continueSequence(
+        buildNoteSequence([{ note: 60, time: Tone.now() }]),
+        20,
+        temperature,
+        ['Cm']
+      );
     }
 
     function setupMIDI () {
-      // MIDI setup
-
       WebMidi.enable(err => {
         if (err) {
           // using more extensive error messaging to pass back to NodeJS
@@ -255,8 +241,8 @@ $(function () {
           return;
         }
         console.log('WebMidi loaded successfully');
-        console.log(WebMidi.inputs);
-        console.log(WebMidi.outputs);
+        console.debug(WebMidi.inputs);
+        console.debug(WebMidi.outputs);
 
         let inputSelector = document.querySelector('#midi-inputs');
         let outputSelector = document.querySelector('#outputs');
@@ -270,285 +256,266 @@ $(function () {
           midiTickCount,
           lastBeatAt;
 
+        function onInputsChange () {
+          if (WebMidi.inputs.length === 0) {
+            onActiveInputChange(null);
+          } else {
+            while (inputSelector.firstChild) {
+              inputSelector.firstChild.remove();
+            }
+            for (let input of WebMidi.inputs) {
+              let option = document.createElement('option');
+              option.value = input.id;
+              option.innerText = input.name;
+              inputSelector.appendChild(option);
+            }
+            onActiveInputChange(WebMidi.inputs[0].id);
+          }
+        }
 
-	// midi_input = WebMidi.inputs[0];
-       // midiInput = WebMidi.getInputByName(config.midiInput);
-       // midiOutput = WebMidi.getOutputByName(config.midiOutput);
-       //
-       //
-       //
-       //  console.log(midiInput);
-       //  console.log(midiOutput);
+        function onOutputsChange () {
+          while (outputSelector.firstChild) {
+            outputSelector.firstChild.remove();
+          }
+          let internalOption = document.createElement('option');
+          internalOption.value = 'internal';
+          internalOption.innerText = 'Internal synth';
+          outputSelector.appendChild(internalOption);
+          for (let output of WebMidi.outputs) {
+            let option = document.createElement('option');
+            option.value = output.id;
+            option.innerText = output.name;
+            outputSelector.appendChild(option);
+          }
+          onActiveOutputChange('internal');
+        }
 
-       function onInputsChange() {
-         if (WebMidi.inputs.length === 0) {
-           // withInputsMsg.style.display = 'none';
-           // noInputsMsg.style.display = 'block';
-           onActiveInputChange(null);
-         } else {
-           // noInputsMsg.style.display = 'none';
-           // withInputsMsg.style.display = 'block';
-           while (inputSelector.firstChild) {
-             inputSelector.firstChild.remove();
-           }
-           for (let input of WebMidi.inputs) {
-             let option = document.createElement('option');
-             option.value = input.id;
-             option.innerText = input.name;
-             inputSelector.appendChild(option);
-           }
-           onActiveInputChange(WebMidi.inputs[0].id);
-         }
-       }
+        function onClockInputsChange () {
+          if (WebMidi.inputs.length === 0) {
+            onActiveClockInputChange('none');
+          } else {
+            while (clockInputSelector.firstChild) {
+              clockInputSelector.firstChild.remove();
+            }
+            let option = document.createElement('option');
+            option.value = 'none';
+            option.innerText = 'None (internal clock)';
+            clockInputSelector.appendChild(option);
 
-       function onOutputsChange() {
-         while (outputSelector.firstChild) {
-           outputSelector.firstChild.remove();
-         }
-         let internalOption = document.createElement('option');
-         internalOption.value = 'internal';
-         internalOption.innerText = 'Internal synth';
-         outputSelector.appendChild(internalOption);
-         for (let output of WebMidi.outputs) {
-           let option = document.createElement('option');
-           option.value = output.id;
-           option.innerText = output.name;
-           outputSelector.appendChild(option);
-         }
-         onActiveOutputChange('internal');
-       }
+            for (let input of WebMidi.inputs) {
+              option = document.createElement('option');
+              option.value = input.id;
+              option.innerText = input.name;
+              clockInputSelector.appendChild(option);
+            }
+            onActiveClockInputChange('none');
+          }
+        }
 
-       function onClockInputsChange() {
-         if (WebMidi.inputs.length === 0) {
-           onActiveClockInputChange('none');
-         } else {
-           while (clockInputSelector.firstChild) {
-             clockInputSelector.firstChild.remove();
-           }
-           let option = document.createElement('option');
-           option.value = 'none';
-           option.innerText = 'None (internal clock)';
-           clockInputSelector.appendChild(option);
+        function onClockOutputsChange () {
+          while (clockOutputSelector.firstChild) {
+            clockOutputSelector.firstChild.remove();
+          }
+          let noneOption = document.createElement('option');
+          noneOption.value = 'none';
+          noneOption.innerText = 'Not sending';
+          clockOutputSelector.appendChild(noneOption);
+          for (let output of WebMidi.outputs) {
+            let option = document.createElement('option');
+            option.value = output.id;
+            option.innerText = output.name;
+            clockOutputSelector.appendChild(option);
+          }
+          onActiveClockOutputChange('none');
+        }
 
-           for (let input of WebMidi.inputs) {
-             option = document.createElement('option');
-             option.value = input.id;
-             option.innerText = input.name;
-             clockInputSelector.appendChild(option);
-           }
-           onActiveClockInputChange('none');
-         }
-       }
+        function onActiveInputChange (id) {
+          if (activeInput) {
+            activeInput.removeListener();
+          }
+          let input = WebMidi.getInputById(id);
+          if (input) {
+            input.addListener('noteon', 1, e => {
+              humanKeyDown(e.note.number, e.velocity);
+            });
+            input.addListener('controlchange', 1, e => {
+              if (e.controller.number === TEMPO_MIDI_CONTROLLER) {
+                Tone.Transport.bpm.value = (e.value / 128) * MAX_MIDI_BPM;
+              }
+            });
+            input.addListener('noteoff', 1, e => humanKeyUp(e.note.number));
+            for (let option of Array.from(inputSelector.children)) {
+              option.selected = option.value === id;
+            }
+            activeInput = input;
+          }
+        }
 
-       function onClockOutputsChange() {
-         while (clockOutputSelector.firstChild) {
-           clockOutputSelector.firstChild.remove();
-         }
-         let noneOption = document.createElement('option');
-         noneOption.value = 'none';
-         noneOption.innerText = 'Not sending';
-         clockOutputSelector.appendChild(noneOption);
-         for (let output of WebMidi.outputs) {
-           let option = document.createElement('option');
-           option.value = output.id;
-           option.innerText = output.name;
-           clockOutputSelector.appendChild(option);
-         }
-         onActiveClockOutputChange('none');
-       }
+        function onActiveOutputChange (id) {
+          if (activeOutput !== 'internal') {
+            outputs[activeOutput] = null;
+          }
+          activeOutput = id;
+          if (activeOutput !== 'internal') {
+            let output = WebMidi.getOutputById(id);
+            outputs[id] = {
+              play: (note, velocity = 1, time, hold = false) => {
+                if (!hold) {
+                  let delay = (time - Tone.now()) * 1000;
+                  let duration = Tone.Time('16n').toMilliseconds();
+                  output.playNote(note, 'all', {
+                    time: delay > 0 ? `+${delay}` : WebMidi.now,
+                    velocity,
+                    duration
+                  });
+                }
+              },
+              stop: (note, time) => {
+                let delay = (time - Tone.now()) * 1000;
+                output.stopNote(note, 2, {
+                  time: delay > 0 ? `+${delay}` : WebMidi.now
+                });
+              }
+            };
+          }
+          for (let option of Array.from(outputSelector.children)) {
+            option.selected = option.value === id;
+          }
+        }
 
-       function onActiveInputChange(id) {
-         if (activeInput) {
-           activeInput.removeListener();
-         }
-         let input = WebMidi.getInputById(id);
-         if (input) {
-           input.addListener('noteon', 1, e => {
-             humanKeyDown(e.note.number, e.velocity);
-             // hideUI();
-           });
-           input.addListener('controlchange', 1, e => {
-             if (e.controller.number === TEMPO_MIDI_CONTROLLER) {
-               Tone.Transport.bpm.value = (e.value / 128) * MAX_MIDI_BPM;
-               // echo.delayTime.value = Tone.Time('8n.').toSeconds();
-             }
-           });
-           input.addListener('noteoff', 1, e => humanKeyUp(e.note.number));
-           for (let option of Array.from(inputSelector.children)) {
-             option.selected = option.value === id;
-           }
-           activeInput = input;
-         }
-       }
+        function startClockOutput () {
+          let output = WebMidi.getOutputById(activeClockOutputId);
+          clockOutputTickerId = Tone.Transport.scheduleRepeat(time => {
+            let startDelay = time - Tone.context.currentTime;
+            let quarter = Tone.Time('4n').toSeconds();
+            for (let i = 0; i < 24; i++) {
+              let tickDelay = startDelay + (quarter / 24) * i;
+              output.sendClock({ time: `+${tickDelay * 1000}` });
+            }
+          }, '4n');
+        }
 
-       function onActiveOutputChange(id) {
-         if (activeOutput !== 'internal') {
-           outputs[activeOutput] = null;
-         }
-         activeOutput = id;
-         if (activeOutput !== 'internal') {
-           let output = WebMidi.getOutputById(id);
-           outputs[id] = {
-             play: (note, velocity = 1, time, hold = false) => {
-               if (!hold) {
-                 let delay = (time - Tone.now()) * 1000;
-                 let duration = Tone.Time('16n').toMilliseconds();
-                 output.playNote(note, 'all', {
-                   time: delay > 0 ? `+${delay}` : WebMidi.now,
-                   velocity,
-                   duration
-                 });
-               }
-             },
-             stop: (note, time) => {
-               let delay = (time - Tone.now()) * 1000;
-               output.stopNote(note, 2, {
-                 time: delay > 0 ? `+${delay}` : WebMidi.now
-               });
-             }
-           };
-         }
-         for (let option of Array.from(outputSelector.children)) {
-           option.selected = option.value === id;
-         }
-       }
+        function stopClockOutput () {
+          Tone.Transport.clear(clockOutputTickerId);
+        }
 
-       function startClockOutput() {
-         let output = WebMidi.getOutputById(activeClockOutputId);
-         clockOutputTickerId = Tone.Transport.scheduleRepeat(time => {
-           let startDelay = time - Tone.context.currentTime;
-           let quarter = Tone.Time('4n').toSeconds();
-           for (let i = 0; i < 24; i++) {
-             let tickDelay = startDelay + (quarter / 24) * i;
-             output.sendClock({ time: `+${tickDelay * 1000}` });
-           }
-         }, '4n');
-       }
+        function onActiveClockOutputChange (id) {
+          if (activeClockOutputId !== 'none') {
+            stopClockOutput();
+          }
+          activeClockOutputId = id;
+          if (activeClockOutputId !== 'none') {
+            startClockOutput();
+          }
+          for (let option of Array.from(clockOutputSelector.children)) {
+            option.selected = option.value === id;
+          }
+        }
 
-       function stopClockOutput() {
-         Tone.Transport.clear(clockOutputTickerId);
-       }
+        function incomingMidiClockStart () {
+          midiTickCount = 0;
+          tick = 0;
+        }
 
-       function onActiveClockOutputChange(id) {
-         if (activeClockOutputId !== 'none') {
-           stopClockOutput();
-         }
-         activeClockOutputId = id;
-         if (activeClockOutputId !== 'none') {
-           startClockOutput();
-         }
-         for (let option of Array.from(clockOutputSelector.children)) {
-           option.selected = option.value === id;
-         }
-       }
+        function incomingMidiClockStop () {
+          midiTickCount = 0;
+          applyHumanKeyChanges();
+        }
 
-       function incomingMidiClockStart() {
-         midiTickCount = 0;
-         tick = 0;
-       }
-
-       function incomingMidiClockStop() {
-         midiTickCount = 0;
-         applyHumanKeyChanges();
-       }
-
-       function incomingMidiClockTick(evt) {
-         if (midiTickCount % 24 === 0) {
-           if (lastBeatAt) {
-             let beatDur = evt.timestamp - lastBeatAt;
-             Tone.Transport.bpm.value = Math.round(60000 / beatDur);
-             // Not sure why this doesn't sync through the BPM automatically. But it doesn't.
-             // echo.delayTime.value = Tone.Time('8n.').toSeconds();
-           }
-           lastBeatAt = evt.timestamp;
-           // turn on clock icon
-           $('#clock').css({color: midiClockOnColor});
-         }
-         if (midiTickCount % 24 === midiClockIconOnTicks) {
+        function incomingMidiClockTick (evt) {
+          if (midiTickCount % 24 === 0) {
+            if (lastBeatAt) {
+              let beatDur = evt.timestamp - lastBeatAt;
+              Tone.Transport.bpm.value = Math.round(60000 / beatDur);
+            }
+            lastBeatAt = evt.timestamp;
+            $('#clock').css({color: midiClockOnColor});
+          }
+          if (midiTickCount % 24 === midiClockIconOnTicks) {
             $('#clock').css({color: midiClockOffColor});
-         }
-         if (midiTickCount % 12 === 0) {
-           doTick();
-       }
-         midiTickCount++;
-       }
+          }
+          if (midiTickCount % 12 === 0) {
+            doTick();
+          }
+          midiTickCount++;
+        }
 
-       function onActiveClockInputChange(id) {
-         if (activeClockInputId === 'none') {
-           Tone.Transport.clear(transportTickerId);
-           transportTickerId = null;
-         } else if (activeClockInputId) {
-           let input = WebMidi.getInputById(activeClockInputId);
-           input.removeListener('start', 'all', incomingMidiClockStart);
-           input.removeListener('stop', 'all', incomingMidiClockStop);
-           input.removeListener('clock', 'all', incomingMidiClockTick);
-         }
-         activeClockInputId = id;
-         if (activeClockInputId === 'none') {
-           transportTickerId = Tone.Transport.scheduleRepeat(doTick, '8n');
-           Tone.Transport.bpm.value = DEFAULT_BPM;
-           // echo.delayTime.value = Tone.Time('8n.').toSeconds();
-         } else {
-           let input = WebMidi.getInputById(id);
-           input.addListener('start', 'all', incomingMidiClockStart);
-           input.addListener('stop', 'all', incomingMidiClockStop);
-           input.addListener('clock', 'all', incomingMidiClockTick);
-           midiTickCount = 0;
-         }
-         for (let option of Array.from(clockInputSelector.children)) {
-           option.selected = option.value === id;
-         }
-       }
+        function onActiveClockInputChange (id) {
+          if (activeClockInputId === 'none') {
+            Tone.Transport.clear(transportTickerId);
+            transportTickerId = null;
+          } else if (activeClockInputId) {
+            let input = WebMidi.getInputById(activeClockInputId);
+            input.removeListener('start', 'all', incomingMidiClockStart);
+            input.removeListener('stop', 'all', incomingMidiClockStop);
+            input.removeListener('clock', 'all', incomingMidiClockTick);
+          }
+          activeClockInputId = id;
+          if (activeClockInputId === 'none') {
+            transportTickerId = Tone.Transport.scheduleRepeat(doTick, '8n');
+            Tone.Transport.bpm.value = DEFAULT_BPM;
+            // echo.delayTime.value = Tone.Time('8n.').toSeconds();
+          } else {
+            let input = WebMidi.getInputById(id);
+            input.addListener('start', 'all', incomingMidiClockStart);
+            input.addListener('stop', 'all', incomingMidiClockStop);
+            input.addListener('clock', 'all', incomingMidiClockTick);
+            midiTickCount = 0;
+          }
+          for (let option of Array.from(clockInputSelector.children)) {
+            option.selected = option.value === id;
+          }
+        }
 
-       onInputsChange();
-       onOutputsChange();
-       onClockInputsChange();
-       onClockOutputsChange();
+        onInputsChange();
+        onOutputsChange();
+        onClockInputsChange();
+        onClockOutputsChange();
 
-       WebMidi.addListener(
-         'connected',
-         () => (
-           onInputsChange(),
-           onOutputsChange(),
-           onClockInputsChange(),
-           onClockOutputsChange()
-         )
-       );
-       WebMidi.addListener(
-         'disconnected',
-         () => (
-           onInputsChange(),
-           onOutputsChange(),
-           onClockInputsChange(),
-           onClockOutputsChange()
-         )
-       );
-       inputSelector.addEventListener('change', evt =>
-         onActiveInputChange(evt.target.value)
-       );
-       outputSelector.addEventListener('change', evt =>
-         onActiveOutputChange(evt.target.value)
-       );
-       clockInputSelector.addEventListener('change', evt =>
-         onActiveClockInputChange(evt.target.value)
-       );
-       clockOutputSelector.addEventListener('change', evt =>
-         onActiveClockOutputChange(evt.target.value)
-       );
-   });
-}
+        WebMidi.addListener(
+          'connected',
+          () => (
+            onInputsChange(),
+            onOutputsChange(),
+            onClockInputsChange(),
+            onClockOutputsChange()
+          )
+        );
+        WebMidi.addListener(
+          'disconnected',
+          () => (
+            onInputsChange(),
+            onOutputsChange(),
+            onClockInputsChange(),
+            onClockOutputsChange()
+          )
+        );
+        inputSelector.addEventListener('change', evt =>
+          onActiveInputChange(evt.target.value)
+        );
+        outputSelector.addEventListener('change', evt =>
+          onActiveOutputChange(evt.target.value)
+        );
+        clockInputSelector.addEventListener('change', evt =>
+          onActiveClockInputChange(evt.target.value)
+        );
+        clockOutputSelector.addEventListener('change', evt =>
+          onActiveClockOutputChange(evt.target.value)
+        );
+      });
+    }
+
     // Startup
     setupMIDI();
     Promise.all([rnn.initialize()])
-           .then(generateDummySequence)
-           .then(() => {
-             Tone.Transport.start();
-             Tone.Transport.bpm.value = DEFAULT_BPM;
-           });
+      .then(generateDummySequence)
+      .then(() => {
+        Tone.Transport.start();
+        Tone.Transport.bpm.value = DEFAULT_BPM;
+      });
 
-   StartAudioContext(Tone.context, document.documentElement);
+    StartAudioContext(Tone.context, document.documentElement);
   }
 
   startContext();
-
-})
+});
