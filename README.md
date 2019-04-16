@@ -9,7 +9,7 @@ This is an effort to make the Magenta processes available for real-time performa
 ### Aniline Arpeggiator
 A port of Tero Parivianen's [Neural Arpeggiator](https://codepen.io/teropa/pen/ddqEwj) with some additional features.
 
-### Aniline Improviser *coming soon*
+### Aniline Improviser *\*coming soon\**
 A port of Tero Parivianens's [Neural Melody Autocompletion](https://codepen.io/teropa/pen/gvwwZL) with some additional features.
 
 *Note: this project currently depends on some web libraries and thus needs a network connection to run properly.*
