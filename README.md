@@ -28,3 +28,5 @@ A port of Tero Parivianens's [Neural Melody Autocompletion](https://codepen.io/t
 - move all libraries to local folders so there is no dependence on the network
 - see if multiple instances can run at the same time (for two player input use)
 - try with the Dodeca https://synthcube.com/cart/magpie-dodeca-spicy-version for more MIDI outputs in Eurorack modular
+- add presets to save i/o settings and parameters
+- add a second settings page for connecting controls to MIDI CCs

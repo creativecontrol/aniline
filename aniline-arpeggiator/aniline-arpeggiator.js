@@ -14,7 +14,7 @@ function createWindow () {
     titleBarStyle: 'hidden',
     fullscreenable: false,
     maximizable: false,
-    resizable: false,
+    resizable: true,
     moveable: true
   });
 

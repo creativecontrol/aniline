@@ -1,8 +1,8 @@
 {
-  "name": "aniline",
-  "version": "0.1.0",
+  "name": "aniline-arpeggiator",
+  "version": "0.2.0",
   "description": "electron app for using neural arpeggiator",
-  "main": "aniline.js",
+  "main": "aniline-arpeggiator.js",
   "scripts": {
     "start": "electron ."
   },
@@ -20,8 +20,12 @@
     "electron": "^4.1.4"
   },
   "dependencies": {
+    "@magenta/music": "^1.7.0",
     "jquery": "^3.4.0",
-    "startaudiocontext": "^1.2.1",
+    "lodash": "^4.17.11",
+    "material-components-web": "^1.1.1",
+    "tonal": "^2.2.2",
+    "tone": "^13.4.9",
     "webmidi": "^2.3.3"
   }
 }
