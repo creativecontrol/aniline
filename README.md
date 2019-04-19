@@ -1,6 +1,6 @@
 # aniline
 
-<img src="https://raw.githubusercontent.com/creativecontrol/aniline/master/aniline_arpeggiator_main.png" width="300px"><img src="https://raw.githubusercontent.com/creativecontrol/aniline/master/aniline_arpeggiator_settings.png" width="300px">
+<img src="https://raw.githubusercontent.com/creativecontrol/aniline/master/aniline-arpeggiator/aniline_arpeggiator_main.png" width="300px"><img src="https://raw.githubusercontent.com/creativecontrol/aniline/master/aniline-improvisor/aniline_improvisor_main.png" width="300px">
 
 Aniline implements [Magenta](https://magenta.tensorflow.org/) Machine Learning music algorithms using MagentaJS and Electron.
 The currently available [Magenta Studio](https://magenta.tensorflow.org/studio) Electron apps from the Magenta team are not real-time.
