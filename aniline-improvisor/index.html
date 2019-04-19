@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="css/main.css">
+
+    <script>window.$ = window.jQuery = require('jquery');</script>
+    <script>window.mdc = require('material-components-web')</script>
+    <script>window.WebMidi = require('webmidi');</script>
+    <script>window._ = require('lodash')</script>
+    <script>window.StartAudioContext = require('startaudiocontext');</script>
+    <script>window.Tonal = require('tonal')</script>
+    <script>window.Tone = require('tone')</script>
+    <script >window.mm = require('@magenta/music')</script>
+    <script src="js/main.js"></script>
+
+    <title></title>
+</head>
+<body class="mdc-typography mdc-theme--primary-bg mdc-theme--on-primary">
+    <div id="root" class="">
+        <div class="mdc-layout-grid">
+            <div class="appHeader">
+                <button id="settings-icon" class="mdc-icon-button">
+                    <span class="material-icons">settings</span>
+                </button>
+                <div id="title" class="center mdc-typography--headline6">aniline</div>
+                <div id="subtitle" class="center mdc-typography--overline">improvisor</div>
+                <hr>
+                <div class="cc-logo center mdc-typography--subtitle2">...  creativecontrol  ...</div>
+            </div>
+
+            <div id="main-page">
+                <div></div>
+                </br>
+                <div>
+                    <div id="temperature" class="mdc-slider" tabindex="0" role="slider" aria-valuemin="0.2" aria-valuemax="2" aria-valuenow="1.1"
+                    aria-label="Select temperature">
+                        <div class="mdc-slider__track-container">
+                            <div class="mdc-slider__track"></div>
+                        </div>
+                        <div class="mdc-slider__thumb-container">
+                            <svg class="mdc-slider__thumb" width="21" height="21">
+                                <circle cx="10.5" cy="10.5" r="7.875"></circle>
+                            </svg>
+                            <div class="mdc-slider__focus-ring"></div>
+                        </div>
+                    </div>
+                    <div class="center"> Temperature</div>
+                </div>
+
+                <div>
+                    <div id="density" class="mdc-slider mdc-slider--discrete" tabindex="0" role="slider" aria-valuemin="0.0" aria-valuemax="100.0" aria-valuenow="90.0"
+                    aria-label="Select density">
+                        <div class="mdc-slider__track-container">
+                            <div class="mdc-slider__track"></div>
+                        </div>
+                        <div class="mdc-slider__thumb-container">
+                            <div class="mdc-slider__pin">
+                                <span class="mdc-slider__pin-value-marker"></span>
+                                </div>
+                            <svg class="mdc-slider__thumb" width="21" height="21">
+                                <circle cx="10.5" cy="10.5" r="7.875"></circle>
+                            </svg>
+                            <div class="mdc-slider__focus-ring"></div>
+                        </div>
+                    </div>
+                    <div class="center"> Density</div>
+                </div>
+
+            </br>
+                <div>
+                    <div class="mdc-select mdc-theme--secondary-bg">
+                        <select id="pattern-length" class="mdc-select__native-control" role="presentation">
+                            <option>4</option>
+                            <option selected>8</option>
+                            <option>16</option>
+                            <option>32</option>
+                        </select>
+                        <label for="pattern-length" class="mdc-floating-label mdc-floating-label--float-above"> pattern length </label>
+                    </div>
+                </div>
+            </br>
+                <div class="center">
+                    <button id="clock" class="mdc-icon-button" disabled>
+                        <span class="material-icons clock">track_changes</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="settings-controls" style="display: none;">
+                <div class="center">
+                    <span class"mdc-typography--headline6"> - Settings - </span>
+                </div>
+            </br>
+            <div>
+                <div class="mdc-select mdc-theme--secondary-bg">
+                    <select id="midi-inputs" class="mdc-select__native-control" role="presentation"></select>
+                    <label for="midi-inputs" class="mdc-floating-label mdc-floating-label--float-above"> midi input </label>
+                </div>
+            </br>
+                <div class="mdc-select mdc-theme--secondary-bg">
+                    <select id="midi-clock-inputs" class="mdc-select__native-control" role="presentation"></select>
+                    <label for="midi-clock-inputs" class="mdc-floating-label mdc-floating-label--float-above"> clock input </label>
+                </div>
+            </div>
+            </br>
+            <div>
+                <div class="mdc-select mdc-theme--secondary-bg">
+                    <select id="outputs" class="mdc-select__native-control" role="presentation"></select>
+                    <label for="outputs" class="mdc-floating-label mdc-floating-label--float-above"> midi output </label>
+                </div>
+            </br>
+            <div class="mdc-select mdc-theme--secondary-bg">
+                <select id="midi-clock-outputs" class="mdc-select__native-control mdc-select-shape-radius" role="presentation"></select>
+                <label for="midi-clock-outputs" class="mdc-floating-label mdc-floating-label--float-above"> clock output </label>
+            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

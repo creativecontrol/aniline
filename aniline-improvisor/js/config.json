@@ -1,0 +1,9 @@
+{
+    "midiInput": "nanoKEY2 MIDI 1",
+    "midiInputLinux": "nanoKEY2 MIDI 1",
+    "midiInputOSX": "nanoKEY2 KEYBOARD",
+    "midiInputChannel": 0,
+    "midiOutput": "Teensy MIDI/Audio MIDI 1", 
+    "midiOutputOSX": "IAC Driver IAC Bus 1",
+    "midiOutputChannel": 0
+}

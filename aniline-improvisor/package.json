@@ -1,8 +1,8 @@
 {
-  "name": "aniline-arpeggiator",
-  "version": "0.2.0",
+  "name": "aniline-improvisor",
+  "version": "0.1.0",
   "description": "electron app for using neural arpeggiator",
-  "main": "aniline-arpeggiator.js",
+  "main": "aniline-improvisor.js",
   "scripts": {
     "start": "electron ."
   },
