@@ -70,17 +70,19 @@
                 </div>
 
             </br>
-                <div>
-                    <div class="mdc-select mdc-theme--secondary-bg">
-                        <select id="pattern-length" class="mdc-select__native-control" role="presentation">
-                            <option>4</option>
-                            <option selected>8</option>
-                            <option>16</option>
-                            <option>32</option>
-                        </select>
-                        <label for="pattern-length" class="mdc-floating-label mdc-floating-label--float-above"> pattern length </label>
+                <!-- <div>
+                    <div class="mdc-select mdc-theme--secondary-bg narrow-selector">
+                        <select id="root" class="mdc-select__native-control" role="presentation"></select>
+                        <label for="root" class="mdc-floating-label mdc-floating-label--float-above"> root </label>
                     </div>
-                </div>
+                    <div class="mdc-select mdc-theme--secondary-bg medium-selector">
+                        <select id="mode" class="mdc-select__native-control" role="presentation">
+                        <option value="major" selected>major</option>
+                        <option value="minor">minor</option>
+                        </select>
+                        <label for="mode" class="mdc-floating-label mdc-floating-label--float-above"> mode </label>
+                    </div>
+                </div> -->
             </br>
                 <div class="center">
                     <button id="clock" class="mdc-icon-button" disabled>
@@ -95,26 +97,45 @@
                 </div>
             </br>
             <div>
-                <div class="mdc-select mdc-theme--secondary-bg">
+                <div class="mdc-select mdc-theme--secondary-bg wide-selector">
                     <select id="midi-inputs" class="mdc-select__native-control" role="presentation"></select>
                     <label for="midi-inputs" class="mdc-floating-label mdc-floating-label--float-above"> midi input </label>
                 </div>
             </br>
-                <div class="mdc-select mdc-theme--secondary-bg">
+                <div class="mdc-select mdc-theme--secondary-bg wide-selector">
                     <select id="midi-clock-inputs" class="mdc-select__native-control" role="presentation"></select>
                     <label for="midi-clock-inputs" class="mdc-floating-label mdc-floating-label--float-above"> clock input </label>
                 </div>
             </div>
-            </br>
             <div>
-                <div class="mdc-select mdc-theme--secondary-bg">
+                <div class="mdc-select mdc-theme--secondary-bg wide-selector">
                     <select id="outputs" class="mdc-select__native-control" role="presentation"></select>
                     <label for="outputs" class="mdc-floating-label mdc-floating-label--float-above"> midi output </label>
                 </div>
+            </div>
             </br>
-            <div class="mdc-select mdc-theme--secondary-bg">
-                <select id="midi-clock-outputs" class="mdc-select__native-control mdc-select-shape-radius" role="presentation"></select>
-                <label for="midi-clock-outputs" class="mdc-floating-label mdc-floating-label--float-above"> clock output </label>
+            <div class="center">
+                <span class"mdc-typography--headline6">- output channels -</span>
+            </div>
+            </br>
+            <div>
+                <div class="mdc-select mdc-theme--secondary-bg narrow-selector">
+                    <select id="improv-channel" class="mdc-select__native-control narrow-selector" role="presentation">
+                    </select>
+                    <label for="improv-channel" class="mdc-floating-label mdc-floating-label--float-above"> improv </label>
+                </div>
+                <div class="mdc-select mdc-theme--secondary-bg narrow-selector">
+                    <select id="bass-channel" class="mdc-select__native-control" role="presentation">
+
+                    </select>
+                    <label for="bass-channel" class="mdc-floating-label mdc-floating-label--float-above"> bass </label>
+                </div>
+                <div class="mdc-select mdc-theme--secondary-bg narrow-selector">
+                    <select id="lead-channel" class="mdc-select__native-control" role="presentation">
+
+                    </select>
+                    <label for="lead-channel" class="mdc-floating-label mdc-floating-label--float-above"> lead </label>
+                </div>
             </div>
 </div>
 </div>

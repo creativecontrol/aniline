@@ -70,6 +70,10 @@ body {
     color: #6d6d6d;
 }
 
+#clock.mdc-icon-button:disabled.on {
+    color: var(--mdc-theme-secondary);
+}
+
 #main-page {
 }
 #settings-controls {

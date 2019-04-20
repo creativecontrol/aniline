@@ -35,8 +35,6 @@ $(function () {
     let currentPlayFn;
     let tick = 0;
     let midiClockIconOnTicks = 5;
-    let midiClockOnColor = '#12e5ed';
-    let midiClockOffColor = '#6d6d6d';
 
     // Temperature control
     let tempSlider = new mdc.slider.MDCSlider(
@@ -429,10 +427,10 @@ $(function () {
               Tone.Transport.bpm.value = Math.round(60000 / beatDur);
             }
             lastBeatAt = evt.timestamp;
-            $('#clock').css({color: midiClockOnColor});
+            $('#clock').toggleClass("on");
           }
           if (midiTickCount % 24 === midiClockIconOnTicks) {
-            $('#clock').css({color: midiClockOffColor});
+            $('#clock').toggleClass("on");
           }
           if (midiTickCount % 12 === 0) {
             doTick();

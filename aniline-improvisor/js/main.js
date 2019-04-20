@@ -14,17 +14,23 @@ $(function () {
   });
 
   function startContext () {
-    const MIN_NOTE = 48;
+
+    const MIN_NOTE = 30;
     const MAX_NOTE = 84;
     const DEFAULT_BPM = 120;
-    const MAX_MIDI_BPM = 240;
-    const TEMPO_MIDI_CONTROLLER = 20; // Control changes for tempo for this controller id
+    const WAIT_TIME = 1000;
+    const LEAD_NOTES = -3;
+    const MIDI_CHANNELS = 16;
 
     let temperature = 1.1;
     let patternLength = 8;
+    let thisPatternLength = 16;
     let density = 90.0;
+    let root = 'C';
+    let mode = 'major'
 
     // Using the Improv RNN pretrained model from https://github.com/tensorflow/magenta/tree/master/magenta/models/improv_rnn
+    // let rnn = new mm.MusicRNN('./magenta/chord_pitches_improv');
     let rnn = new mm.MusicRNN(
       'https://storage.googleapis.com/download.magenta.tensorflow.org/tfjs_checkpoints/music_rnn/chord_pitches_improv'
     );
@@ -35,8 +41,9 @@ $(function () {
     let currentPlayFn;
     let tick = 0;
     let midiClockIconOnTicks = 5;
-    let midiClockOnColor = '#12e5ed';
-    let midiClockOffColor = '#6d6d6d';
+    let leadSet = '';
+    let tonicLast = '';
+    let tonicM = '';
 
     // Temperature control
     let tempSlider = new mdc.slider.MDCSlider(
@@ -44,16 +51,25 @@ $(function () {
     );
     tempSlider.listen('MDCSlider:change', () => (temperature = tempSlider.value));
 
-    // Pattern length
-    document
-      .querySelector('#pattern-length')
-      .addEventListener('change', evt => (patternLength = evt.target.value));
-
     // Density control
     let densitySlider = new mdc.slider.MDCSlider(
       document.querySelector('#density')
     );
     densitySlider.listen('MDCSlider:change', () => (density = densitySlider.value));
+
+    // // Root select
+    // let rootSelector = document.querySelector('#root');
+    // rootSelector.addEventListener('change', evt => (root = evt.target.value));
+    //
+    //   // Mode select
+    //   let modeSelector = document.querySelector('#mode');
+    //   modeSelector.addEventListener('change', evt => (mode = evt.target.value));
+    //   for(let scale of Tonal.Dictionary.scale.names()){
+    //       option = document.createElement('option');
+    //       option.value = scale;
+    //       option.innerText = scale;
+    //       modeSelector.appendChild(option);
+    //   }
 
     let outputs = {
       internal: {
@@ -64,6 +80,35 @@ $(function () {
       }
     };
     let activeOutput = 'internal';
+
+    function getSeedIntervals(seed) {
+      let intervals = [];
+      for (let i = 0; i < seed.length - 1; i++) {
+        let rawInterval = seed[i + 1].time - seed[i].time;
+        let measure = _.minBy(['8n', '4n'], subdiv =>
+          Math.abs(rawInterval - Tone.Time(subdiv).toSeconds())
+        );
+        intervals.push(Tone.Time(measure).toSeconds());
+      }
+      return intervals;
+    }
+
+    function getSequenceLaunchWaitTime(seed) {
+      if (seed.length <= 1) {
+        return 1;
+      }
+      let intervals = getSeedIntervals(seed);
+      let maxInterval = _.max(intervals);
+      return maxInterval * 2;
+    }
+
+    function getSequencePlayIntervalTime(seed) {
+      if (seed.length <= 1) {
+        return Tone.Time('8n').toSeconds();
+      }
+      let intervals = getSeedIntervals(seed).sort();
+      return _.first(intervals);
+    }
 
     function isAccidental (note) {
       let pc = note % 12;
@@ -81,35 +126,34 @@ $(function () {
         .filter(x => x);
     }
 
-    function buildNoteSequence (seed) {
-      let step = 0;
-      let delayProb = pulsePattern ? 0 : 0.3;
-      let notes = seed.map(n => {
-        let dur = 1 + (Math.random() < delayProb ? 1 : 0);
-        let note = {
-          pitch: n.note,
-          quantizedStartStep: step,
-          quantizedEndStep: step + dur
-        };
-        step += dur;
-        return note;
-      });
-      return {
-        totalQuantizedSteps: _.last(notes).quantizedEndStep,
-        quantizationInfo: {
-          stepsPerQuarter: 1
+    function buildNoteSequence(seed) {
+      return mm.sequences.quantizeNoteSequence(
+        {
+          ticksPerQuarter: 220,
+          totalTime: seed.length * 0.5,
+          quantizationInfo: {
+            stepsPerQuarter: 1
+          },
+          timeSignatures: [
+            {
+              time: 0,
+              numerator: 4,
+              denominator: 4
+            }
+          ],
+          tempos: [
+            {
+              time: 0,
+              qpm: 120
+            }
+          ],
+          notes: seed.map((n, idx) => ({
+            pitch: n.note,
+            startTime: idx * 0.5,
+            endTime: (idx + 1) * 0.5
+          }))
         },
-        notes
-      };
-    }
-
-    function seqToTickArray (seq) {
-      return _.flatMap(seq.notes, n =>
-        [n.pitch].concat(
-          pulsePattern
-            ? []
-            : _.times(n.quantizedEndStep - n.quantizedStartStep - 1, () => null)
-        )
+        1
       );
     }
 
@@ -120,20 +164,36 @@ $(function () {
 
     function startSequenceGenerator (seed) {
       let running = true;
-      let thisPatternLength = patternLength;
+      let lastGenerationTask = Promise.resolve();
       let chords = detectChord(seed);
       let chord =
         _.first(chords) ||
         Tonal.Note.pc(Tonal.Note.fromMidi(_.first(seed).note)) + 'M';
       let seedSeq = buildNoteSequence(seed);
-      let generatedSequence = seqToTickArray(seedSeq);
-      let playIntervalTime = Tone.Time('8n').toSeconds();
+      let generatedSequence =
+        Math.random() < 0.7 ? _.clone(seedSeq.notes.map(n => n.pitch)) : [];
+      let launchWaitTime = getSequenceLaunchWaitTime(seed);
+      let playIntervalTime = getSequencePlayIntervalTime(seed);
       let generationIntervalTime = playIntervalTime / 2;
       function generateNext () {
         if (!running) return;
-        if (generatedSequence.length < thisPatternLength) {
-          rnn.continueSequence(seedSeq, 20, temperature, [chord]).then(genSeq => {
-            generatedSequence = generatedSequence.concat(seqToTickArray(genSeq));
+        // if (generatedSequence.length < 10) {
+        //    lastGenerationTask = rnn
+        //     .continueSequence(seedSeq, 20, temperature, [chord])
+        //     .then(genSeq => {
+        //       generatedSequence = generatedSequence.concat(
+        //         genSeq.notes.map(n => n.pitch)
+        //       );
+        //       setTimeout(generateNext, generationIntervalTime * 1000);
+        //     });
+        // } else {
+        //   setTimeout(generateNext, generationIntervalTime * 1000);
+        // }
+      // TODO: Descide if we should do this based on clock (probably yes)
+        if (generatedSequence.length < 10) {
+            lastGenerationTask = rnn
+            .continueSequence(seedSeq, 20, temperature, [chord]).then(genSeq => {
+            generatedSequence = generatedSequence.concat( genSeq.notes.map(n => n.pitch));
             setTimeout(generateNext, generationIntervalTime * 1000);
           });
         }
@@ -149,13 +209,29 @@ $(function () {
         tick++;
       };
 
-      setTimeout(generateNext, 0);
-
-      return () => {
-        running = false;
-        currentPlayFn = null;
-      };
+    function consumeNext(time) {
+      if (generatedSequence.length) {
+        let note = generatedSequence.shift();
+        if (note > 0) {
+          machineKeyDown(note, time);
+        }
+      }
     }
+
+    // setTimeout(generateNext, launchWaitTime * 1000);
+    setTimeout(generateNext, 0);
+    // let consumerId = Tone.Transport.scheduleRepeat(
+    //   consumeNext,
+    //   playIntervalTime,
+    //   Tone.Transport.seconds + launchWaitTime
+    // );
+
+    return () => {
+      running = false;
+      currentPlayFn = null;
+      // Tone.Transport.clear(consumerId);
+    };
+  }
 
     function updateChord ({ add = [], remove = [] }) {
       for (let note of add) {
@@ -169,7 +245,8 @@ $(function () {
         stopCurrentSequenceGenerator();
         stopCurrentSequenceGenerator = null;
       }
-      if (currentSeed.length) {
+      if (currentSeed.length && !stopCurrentSequenceGenerator) {
+        resetState = true;
         stopCurrentSequenceGenerator = startSequenceGenerator(
           _.cloneDeep(currentSeed)
         );
@@ -247,7 +324,10 @@ $(function () {
         let inputSelector = document.querySelector('#midi-inputs');
         let outputSelector = document.querySelector('#outputs');
         let clockInputSelector = document.querySelector('#midi-clock-inputs');
-        let clockOutputSelector = document.querySelector('#midi-clock-outputs');
+
+        let improvChannelSelector = document.querySelector('#improv-channel');
+        let bassChannelSelector = document.querySelector('#bass-channel');
+        let leadChannelSelector = document.querySelector('#lead-channel');
         let activeInput,
           activeClockInputId,
           activeClockOutputId,
@@ -255,6 +335,25 @@ $(function () {
           clockOutputTickerId,
           midiTickCount,
           lastBeatAt;
+
+        function* range(start, end) {
+            for (let i = start; i <= end; i++) {
+                yield i;
+            }
+        }
+
+        function fillChannels (selector) {
+            for (i of range(1, MIDI_CHANNELS)) {
+                  option = document.createElement('option');
+                  option.value = i;
+                  option.innerText = _.padStart(i,2,'0');
+                  selector.appendChild(option);
+              }
+        }
+
+        fillChannels(improvChannelSelector);
+        fillChannels(bassChannelSelector);
+        fillChannels(leadChannelSelector);
 
         function onInputsChange () {
           if (WebMidi.inputs.length === 0) {
@@ -277,10 +376,6 @@ $(function () {
           while (outputSelector.firstChild) {
             outputSelector.firstChild.remove();
           }
-          let internalOption = document.createElement('option');
-          internalOption.value = 'internal';
-          internalOption.innerText = 'Internal synth';
-          outputSelector.appendChild(internalOption);
           for (let output of WebMidi.outputs) {
             let option = document.createElement('option');
             option.value = output.id;
@@ -310,23 +405,6 @@ $(function () {
             }
             onActiveClockInputChange('none');
           }
-        }
-
-        function onClockOutputsChange () {
-          while (clockOutputSelector.firstChild) {
-            clockOutputSelector.firstChild.remove();
-          }
-          let noneOption = document.createElement('option');
-          noneOption.value = 'none';
-          noneOption.innerText = 'Not sending';
-          clockOutputSelector.appendChild(noneOption);
-          for (let output of WebMidi.outputs) {
-            let option = document.createElement('option');
-            option.value = output.id;
-            option.innerText = output.name;
-            clockOutputSelector.appendChild(option);
-          }
-          onActiveClockOutputChange('none');
         }
 
         function onActiveInputChange (id) {
@@ -399,19 +477,6 @@ $(function () {
           Tone.Transport.clear(clockOutputTickerId);
         }
 
-        function onActiveClockOutputChange (id) {
-          if (activeClockOutputId !== 'none') {
-            stopClockOutput();
-          }
-          activeClockOutputId = id;
-          if (activeClockOutputId !== 'none') {
-            startClockOutput();
-          }
-          for (let option of Array.from(clockOutputSelector.children)) {
-            option.selected = option.value === id;
-          }
-        }
-
         function incomingMidiClockStart () {
           midiTickCount = 0;
           tick = 0;
@@ -429,10 +494,10 @@ $(function () {
               Tone.Transport.bpm.value = Math.round(60000 / beatDur);
             }
             lastBeatAt = evt.timestamp;
-            $('#clock').css({color: midiClockOnColor});
+            $('#clock').toggleClass("on");
           }
           if (midiTickCount % 24 === midiClockIconOnTicks) {
-            $('#clock').css({color: midiClockOffColor});
+            $('#clock').toggleClass("on");
           }
           if (midiTickCount % 12 === 0) {
             doTick();
@@ -470,15 +535,13 @@ $(function () {
         onInputsChange();
         onOutputsChange();
         onClockInputsChange();
-        onClockOutputsChange();
 
         WebMidi.addListener(
           'connected',
           () => (
             onInputsChange(),
             onOutputsChange(),
-            onClockInputsChange(),
-            onClockOutputsChange()
+            onClockInputsChange()
           )
         );
         WebMidi.addListener(
@@ -486,8 +549,7 @@ $(function () {
           () => (
             onInputsChange(),
             onOutputsChange(),
-            onClockInputsChange(),
-            onClockOutputsChange()
+            onClockInputsChange()
           )
         );
         inputSelector.addEventListener('change', evt =>
@@ -498,9 +560,6 @@ $(function () {
         );
         clockInputSelector.addEventListener('change', evt =>
           onActiveClockInputChange(evt.target.value)
-        );
-        clockOutputSelector.addEventListener('change', evt =>
-          onActiveClockOutputChange(evt.target.value)
         );
       });
     }

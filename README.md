@@ -2,9 +2,9 @@
 
 <img src="https://raw.githubusercontent.com/creativecontrol/aniline/master/aniline-arpeggiator/aniline_arpeggiator_main.png" width="300px"><img src="https://raw.githubusercontent.com/creativecontrol/aniline/master/aniline-improvisor/aniline_improvisor_main.png" width="300px">
 
-Aniline implements [Magenta](https://magenta.tensorflow.org/) Machine Learning music algorithms using MagentaJS and Electron.
+Aniline is a set of standalone, cross-platform apps that implement [Magenta](https://magenta.tensorflow.org/) Machine Learning music algorithms using MagentaJS and Electron.
 The currently available [Magenta Studio](https://magenta.tensorflow.org/studio) Electron apps from the Magenta team are not real-time.
-This is an effort to make the Magenta processes available for real-time performance use.
+This is an effort to make the Magenta processes available for real-time performance use. Musical data and control is implemented in MIDI, allowing the processes to be inserted into most electronic music performance setups.
 
 ### Aniline Arpeggiator
 A port of Tero Parivianen's [Neural Arpeggiator](https://codepen.io/teropa/pen/ddqEwj) with some additional features.
@@ -17,12 +17,15 @@ A port of Tero Parivianens's [Neural Melody Autocompletion](https://codepen.io/t
 ## INSTALLATION
 - install NodeJS and NPM
 - git clone this repo
-- cd aniline
+- cd aniline/<name of instrument>
 - npm install
+- npm start
 
 ## BUILD
 *coming soon*
 
+## PERFORM
+*coming soon*
 
 ## TODO:
 - move all libraries to local folders so there is no dependence on the network
