@@ -2,8 +2,8 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="css/material-components-web.min.css">
+    <link rel="stylesheet" href="css/icon.css">
     <link rel="stylesheet" href="css/main.css">
 
     <script>window.$ = window.jQuery = require('jquery');</script>
@@ -13,7 +13,7 @@
     <script>window.StartAudioContext = require('startaudiocontext');</script>
     <script>window.Tonal = require('tonal')</script>
     <script>window.Tone = require('tone')</script>
-    <script >window.mm = require('@magenta/music')</script>
+    <script>window.mm = require('@magenta/music')</script>
     <script src="js/main.js"></script>
 
     <title></title>
@@ -29,6 +29,7 @@
                 <div id="subtitle" class="center mdc-typography--overline">arpeggiator</div>
                 <hr>
                 <div class="cc-logo center mdc-typography--subtitle2">...  creativecontrol  ...</div>
+                <div class="version mdc-typography--subtitle2"></div>
             </div>
 
             <div id="main-page">
@@ -47,7 +48,7 @@
                             <div class="mdc-slider__focus-ring"></div>
                         </div>
                     </div>
-                    <div class="center"> Temperature</div>
+                    <div class="center">Temperature</div>
                 </div>
 
                 <div>
@@ -66,13 +67,13 @@
                             <div class="mdc-slider__focus-ring"></div>
                         </div>
                     </div>
-                    <div class="center"> Density</div>
+                    <div class="center">Density</div>
                 </div>
 
             </br>
                 <div>
-                    <div class="mdc-select mdc-theme--secondary-bg">
-                        <select id="pattern-length" class="mdc-select__native-control" role="presentation">
+                    <div id="pattern-length" class="mdc-select mdc-theme--secondary-bg">
+                        <select class="mdc-select__native-control" role="presentation">
                             <option>4</option>
                             <option selected>8</option>
                             <option>16</option>
@@ -91,33 +92,78 @@
 
             <div id="settings-controls" style="display: none;">
                 <div class="center">
-                    <span class"mdc-typography--headline6"> - Settings - </span>
+                    <div>
+                      <span class"mdc-typography--headline6"> - Settings - </span>
+                    </div>
+                    <div class="mdc-radio mdc-radio-without-ripple">
+                      <input class="mdc-radio__native-control" type="radio" id="settings-radio-1" name="radios" checked>
+                      <div class="mdc-radio__background">
+                        <div class="mdc-radio__outer-circle"></div>
+                        <div class="mdc-radio__inner-circle"></div>
+                      </div>
+                    </div>
+                    <div class="mdc-radio mdc-radio-without-ripple">
+                      <input class="mdc-radio__native-control" type="radio" id="settings-radio-2" name="radios">
+                      <div class="mdc-radio__background">
+                        <div class="mdc-radio__outer-circle"></div>
+                        <div class="mdc-radio__inner-circle"></div>
+                      </div>
+                    </div>
                 </div>
             </br>
-            <div>
-                <div class="mdc-select mdc-theme--secondary-bg">
-                    <select id="midi-inputs" class="mdc-select__native-control" role="presentation"></select>
-                    <label for="midi-inputs" class="mdc-floating-label mdc-floating-label--float-above"> midi input </label>
-                </div>
-            </br>
-                <div class="mdc-select mdc-theme--secondary-bg">
-                    <select id="midi-clock-inputs" class="mdc-select__native-control" role="presentation"></select>
-                    <label for="midi-clock-inputs" class="mdc-floating-label mdc-floating-label--float-above"> clock input </label>
-                </div>
+            <div id="settings1">
+              <div>
+                  <div id="input-select" class="mdc-select mdc-theme--secondary-bg">
+                      <select id="midi-inputs" class="mdc-select__native-control" role="presentation"></select>
+                      <label for="midi-inputs" class="mdc-floating-label mdc-floating-label--float-above"> midi input </label>
+                  </div>
+              </br>
+                  <div id="clock-select" class="mdc-select mdc-theme--secondary-bg">
+                      <select id="midi-clock-inputs" class="mdc-select__native-control" role="presentation"></select>
+                      <label for="midi-clock-inputs" class="mdc-floating-label mdc-floating-label--float-above"> clock input </label>
+                  </div>
+              </div>
+              </br>
+              <div>
+                  <div id="output-select" class="mdc-select mdc-theme--secondary-bg">
+                      <select id="midi-outputs" class="mdc-select__native-control" role="presentation"></select>
+                      <label for="midi-outputs" class="mdc-floating-label mdc-floating-label--float-above"> midi output </label>
+                  </div>
+              </div>
             </div>
-            </br>
-            <div>
-                <div class="mdc-select mdc-theme--secondary-bg">
-                    <select id="outputs" class="mdc-select__native-control" role="presentation"></select>
-                    <label for="outputs" class="mdc-floating-label mdc-floating-label--float-above"> midi output </label>
+            <div id="settings2" style="display: none;">
+              <div class="center">
+                  <span class"mdc-typography--headline6">- MIDI CC controls -</span>
+              </div>
+              </br>
+              <div>
+                <div id="tempCCField" class="mdc-text-field mdc-theme--secondary-bg narrow-selector">
+                    <input type="number" id="temperature-cc" class="mdc-text-field__input" min="0" max="127">
+                    <label for="temperature-cc" class="mdc-floating-label mdc-floating-label--float-above"> temp. </label>
                 </div>
-            </br>
-            <div class="mdc-select mdc-theme--secondary-bg">
-                <select id="midi-clock-outputs" class="mdc-select__native-control mdc-select-shape-radius" role="presentation"></select>
-                <label for="midi-clock-outputs" class="mdc-floating-label mdc-floating-label--float-above"> clock output </label>
+                <div id="densCCField" class="mdc-text-field mdc-theme--secondary-bg narrow-selector">
+                    <input type="number" id="density-cc" class="mdc-text-field__input" min="0" max="127">
+                    <label for="density-cc" class="mdc-floating-label mdc-floating-label--float-above"> density </label>
+                </div>
+                <div id="pattCCField" class="mdc-text-field mdc-theme--secondary-bg narrow-selector">
+                    <input type="number" id="pattern-cc" class="mdc-text-field__input" min="0" max="127">
+                    <label for="pattern-cc" class="mdc-floating-label mdc-floating-label--float-above"> pattern </label>
+                </div>
+              </div>
+              <br>
+              <div id="storage" class="center">
+                  <div id="save" class="mdc-chip" tabindex="0">
+                    <i class="material-icons mdc-chip__icon mdc-chip__icon--leading">save</i>
+                    <div class="mdc-chip__text">save prefs</div>
+                  </div>
+                  <div id="load" class="mdc-chip" tabindex="1">
+                    <i class="material-icons mdc-chip__icon mdc-chip__icon--leading">launch</i>
+                    <div class="mdc-chip__text">load prefs</div>
+                  </div>
+
+              </div>
             </div>
-</div>
-</div>
+          </div>
 </div>
 </div>
 </div>

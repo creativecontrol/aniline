@@ -6,6 +6,10 @@ $(function () {
   var midiOutput = null;
   var midiInput = null;
   var settingPageVisible = false;
+
+  let version = '0.1.0';
+  $('.version').text('v.' + version);
+
   console.log('internal JS loaded');
 
   $('#settings-icon').click(function () {
@@ -324,7 +328,6 @@ $(function () {
         let inputSelector = document.querySelector('#midi-inputs');
         let outputSelector = document.querySelector('#outputs');
         let clockInputSelector = document.querySelector('#midi-clock-inputs');
-
         let improvChannelSelector = document.querySelector('#improv-channel');
         let bassChannelSelector = document.querySelector('#bass-channel');
         let leadChannelSelector = document.querySelector('#lead-channel');
@@ -336,19 +339,19 @@ $(function () {
           midiTickCount,
           lastBeatAt;
 
-        function* range(start, end) {
-            for (let i = start; i <= end; i++) {
-                yield i;
-            }
+        function * range (start, end) {
+          for (let i = start; i <= end; i++) {
+            yield i;
+          }
         }
 
         function fillChannels (selector) {
-            for (i of range(1, MIDI_CHANNELS)) {
-                  option = document.createElement('option');
-                  option.value = i;
-                  option.innerText = _.padStart(i,2,'0');
-                  selector.appendChild(option);
-              }
+          for (let i of range(1, MIDI_CHANNELS)) {
+            let option = document.createElement('option');
+            option.value = i;
+            option.innerText = _.padStart(i, 2, '0');
+            selector.appendChild(option);
+          }
         }
 
         fillChannels(improvChannelSelector);
@@ -382,7 +385,7 @@ $(function () {
             option.innerText = output.name;
             outputSelector.appendChild(option);
           }
-          onActiveOutputChange('internal');
+          onActiveOutputChange(WebMidi.outputs[0].id);
         }
 
         function onClockInputsChange () {
@@ -403,7 +406,7 @@ $(function () {
               option.innerText = input.name;
               clockInputSelector.appendChild(option);
             }
-            onActiveClockInputChange('none');
+            onActiveClockInputChange(WebMidi.inputs[0].id);
           }
         }
 

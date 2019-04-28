@@ -21,11 +21,10 @@
   },
   "dependencies": {
     "@magenta/music": "^1.7.0",
+    "electron-store": "^3.2.0",
     "jquery": "^3.4.0",
     "lodash": "^4.17.11",
     "material-components-web": "^1.1.1",
-    "static-eval": "^2.0.2",
-    "static-module": "^3.0.3",
     "tonal": "^2.2.2",
     "tone": "^13.4.9",
     "webmidi": "^2.3.3"

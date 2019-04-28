@@ -99,3 +99,11 @@ body {
     color: #FFD700;
     bottom: 1rem;
 }
+
+.version {
+  position: fixed;
+  color: #6d6d6d;
+  right: 1rem;
+  bottom: 1rem;
+
+}

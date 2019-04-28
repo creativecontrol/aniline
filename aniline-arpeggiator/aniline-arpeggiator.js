@@ -4,8 +4,11 @@
 * This is an effort to make the Magenta processes available for real-time preformance use.
 */
 
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, ipcMain} = require('electron');
 const webpage = 'index.html';
+
+const DataStore = require('./DataStore');
+const prefsData = new DataStore();
 
 function createWindow () {
   let window = new BrowserWindow({
@@ -19,6 +22,16 @@ function createWindow () {
   });
 
   window.loadFile(webpage);
+
+  ipcMain.on('store-prefs', (event, prefs) => {
+    prefsData.savePrefs(prefs);
+  });
+
+  ipcMain.on('load-prefs', () => {
+    let prefs = prefsData.getPrefs().prefs;
+    console.debug(prefs);
+    window.send('prefs', prefs);
+  });
 
   window.on('closed', () => {
     window = null;

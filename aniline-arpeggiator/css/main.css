@@ -29,12 +29,35 @@ body {
     border-width: 0px;
 }
 
+.mdc-select.wide-selector {
+    width: 300px;
+}
+.mdc-select.medium-selector {
+    width: 150px;
+}
+
+.mdc-select.narrow-selector {
+    width: 81px;
+}
+
 .mdc-select__native-control {
     border-bottom: none;
+    padding-right: 32px;
 }
 
 .mdc-select__native-control:hover {
     border-bottom: none;
+}
+
+.mdc-text-field {
+    border-radius: 30px;
+    width: 300px;
+    border:none;
+    border-width: 0px;
+}
+
+.mdc-text-field.narrow-selector {
+    width: 81px;
 }
 
 #settings-icon {
@@ -43,6 +66,9 @@ body {
     top:1rem;
 }
 
+.mdc-chip {
+  margin: 6px;
+}
 .settings {
 
 }
@@ -76,6 +102,7 @@ body {
 
 #main-page {
 }
+
 #settings-controls {
     align-items: right;
 }
@@ -87,4 +114,12 @@ body {
     margin-left: -100px;
     color: #FFD700;
     bottom: 1rem;
+}
+
+.version {
+  position: fixed;
+  color: #6d6d6d;
+  right: 1rem;
+  bottom: 1rem;
+
 }
