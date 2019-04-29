@@ -22,7 +22,11 @@ A port of Tero Parivianens's [Neural Melody Autocompletion](https://codepen.io/t
 - npm start
 
 ## BUILD
-*coming soon*
+Aniline use electron-builder to build Native Apps from the Electron code. To generate the app for your platform:
+- cd aniline/<name of instrument>
+- npm run dist
+- cd dist
+- install the App from the dmg, deb, or exe
 
 ## PERFORM
 *coming soon*
