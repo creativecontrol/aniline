@@ -252,11 +252,11 @@ $(function () {
       if (humanKeyAdds.length === 0 && humanKeyRemovals.length === 0) return;
       for (let { note, velocity } of humanKeyAdds) {
         console.debug('play output ' + note + ' ' + time);
-        outputs[activeOutput].play(note, velocity, time, true);
+        outputs[activeOutput.id].play(note, velocity, time, true);
       }
       for (let { note } of humanKeyRemovals) {
         console.debug('stop output ' + note + ' ' + time);
-        outputs[activeOutput].stop(note, time);
+        outputs[activeOutput.id].stop(note, time);
       }
       updateChord({
         add: humanKeyAdds.map(n => n.note),
@@ -276,7 +276,7 @@ $(function () {
       console.debug('play output ' + note + ' ' + time);
       let velocityDensity = setDensity(0.7);
       console.debug('vel den: ' + velocityDensity);
-      outputs[activeOutput].play(note, velocityDensity, time);
+      outputs[activeOutput.id].play(note, velocityDensity, time);
     }
 
     function generateDummySequence () {
@@ -381,16 +381,22 @@ $(function () {
           humanKeyDown(e.note.number, e.velocity);
         });
         input.addListener('controlchange', 1, e => {
-          if (e.controller.number === parseInt(midiCCTemp)) {
-            let temp = e.value.map(0, 127, tempSlider.min, tempSlider.max);
-            tempSlider.value = temp;
+          if (midiCCTemp !== undefined) {
+              if (e.controller.number === parseInt(midiCCTemp)) {
+                let temp = e.value.map(0, 127, tempSlider.min, tempSlider.max);
+                tempSlider.value = temp;
+            }
           }
-          if (e.controller.number === parseInt(midiCCPatt)) {
-            let pattern = e.value.map(0, 127, 0, patternSelect.nativeControl_.length-1);
-            patternSelect.selectedIndex = pattern;
+          if (midiCCPatt !== undefined) {
+            if (e.controller.number === parseInt(midiCCPatt)) {
+              let pattern = e.value.map(0, 127, 0, patternSelect.nativeControl_.length-1);
+              patternSelect.selectedIndex = pattern;
+            }
           }
-          if (e.controller.number === parseInt(midiCCDens)) {
-            densitySlider.value = e.value.map(0, 127, densitySlider.min, densitySlider.max);
+          if (midiCCDens !== undefined) {
+            if (e.controller.number === parseInt(midiCCDens)) {
+              densitySlider.value = e.value.map(0, 127, densitySlider.min, densitySlider.max);
+            }
           }
         });
         input.addListener('noteoff', 1, e => humanKeyUp(e.note.number));
