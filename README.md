@@ -32,8 +32,10 @@ Aniline use electron-builder to build Native Apps from the Electron code. To gen
 *coming soon*
 
 ## TODO:
-- move all libraries to local folders so there is no dependence on the network
-- see if multiple instances can run at the same time (for two player input use)
-- try with the Dodeca https://synthcube.com/cart/magpie-dodeca-spicy-version for more MIDI outputs in Eurorack modular
-- add presets to save i/o settings and parameters
-- add a second settings page for connecting controls to MIDI CCs
+- include a properly link Magenta models to remove dependance on network connection
+- create user documentation
+- <del>move all libraries to local folders so there is no dependence on the network</del> - COMPLETE
+- <del>see if multiple instances can run at the same time (for two player input use)</del> - COMPLETE
+- <del>try with the Dodeca https://synthcube.com/cart/magpie-dodeca-spicy-version for more MIDI outputs in Eurorack modular</del> - COMPLETE
+- <del>add presets to save i/o settings and parameters</del> - COMPLETE
+- <del>add a second settings page for connecting controls to MIDI CCs</del> - COMPLETE
