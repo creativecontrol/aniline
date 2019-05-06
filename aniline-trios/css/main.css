@@ -1,0 +1,125 @@
+:root {
+    --mdc-theme-primary: #333333;
+    --mdc-theme-background: #000;
+    --mdc-theme-secondary: #12e5ed;
+    --mdc-theme-on-primary: #DCDCDC;
+    --mdc-theme-on-secondary: #DCDCDC;
+}
+
+:not(input):not(textarea),
+:not(input):not(textarea)::after,
+:not(input):not(textarea)::before {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+hr {
+    border-color: #12e5ed;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.mdc-select {
+    border-radius: 30px;
+    width: 300px;
+    border:none;
+    border-width: 0px;
+}
+
+.mdc-select.wide-selector {
+    width: 300px;
+}
+.mdc-select.medium-selector {
+    width: 150px;
+}
+
+.mdc-select.narrow-selector {
+    width: 81px;
+}
+
+.mdc-select__native-control {
+    border-bottom: none;
+    padding-right: 32px;
+}
+
+.mdc-select__native-control:hover {
+    border-bottom: none;
+}
+
+.mdc-text-field {
+    border-radius: 30px;
+    width: 300px;
+    border:none;
+    border-width: 0px;
+}
+
+.mdc-text-field.narrow-selector {
+    width: 81px;
+}
+
+#settings-icon {
+    position:fixed;
+    right:1rem;
+    top:1rem;
+}
+
+.mdc-chip {
+  margin: 6px;
+}
+.settings {
+
+}
+
+.rounded {
+
+}
+
+.appHeader {
+    -webkit-app-region: drag;
+}
+
+.center {
+    text-align: center;
+}
+
+#clock {
+    position: fixed;
+    width:100px;
+    bottom: 60px;
+    left: 50%;
+    margin-left: -50px;
+}
+#clock.mdc-icon-button:disabled {
+    color: #6d6d6d;
+}
+
+#clock.mdc-icon-button:disabled.on {
+    color: var(--mdc-theme-secondary);
+}
+
+#main-page {
+}
+
+#settings-controls {
+    align-items: right;
+}
+
+.cc-logo {
+    position:fixed;
+    width: 200px;
+    left: 50%;
+    margin-left: -100px;
+    color: #FFD700;
+    bottom: 1rem;
+}
+
+.version {
+  position: fixed;
+  color: #6d6d6d;
+  right: 1rem;
+  bottom: 1rem;
+
+}

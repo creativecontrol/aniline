@@ -1,0 +1,69 @@
+{
+  "name": "aniline-perpetuator",
+  "version": "0.0.1",
+  "description": "electron app for perpetual melody generator",
+  "main": "aniline-perpetuator.js",
+  "scripts": {
+    "postinstall": "install-dep-apps",
+    "start": "electron .",
+    "pack": "build --dir",
+    "dist": "build"
+  },
+  "build": {
+    "appId": "cc.creativecontrol.aniline-perpetuator",
+    "productName": "aniline perpetuator",
+    "copyright": "Copyright © 2019 ${author}",
+    "mac": {
+        "category": "public.app-category.music",
+        "target": "dmg"
+    },
+    "dmg": {
+        "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "squirrel",
+      "icon": "build/icon.ico"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creativecontrol/aniline.git"
+  },
+  "author": "creativecontrol",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/creativecontrol/aniline/issues"
+  },
+  "homepage": "https://github.com/creativecontrol/aniline#readme",
+  "devDependencies": {
+    "electron": "^4.1.4",
+    "electron-builder": "^20.39.0"
+  },
+  "dependencies": {
+    "@magenta/music": "^1.7.0",
+    "electron-store": "^3.2.0",
+    "jquery": "^3.4.0",
+    "lodash": "^4.17.11",
+    "material-components-web": "^1.1.1",
+    "tonal": "^2.2.2",
+    "tone": "^13.4.9",
+    "webmidi": "^2.3.3"
+  }
+}

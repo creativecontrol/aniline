@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/material-components-web.min.css">
+    <link rel="stylesheet" href="css/icon.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <script>window.$ = window.jQuery = require('jquery');</script>
+    <script>window.mdc = require('material-components-web')</script>
+    <script>window.WebMidi = require('webmidi');</script>
+    <script>window._ = require('lodash')</script>
+    <script>window.StartAudioContext = require('startaudiocontext');</script>
+    <script>window.Tonal = require('tonal')</script>
+    <script>window.Tone = require('tone')</script>
+    <script>window.mm = require('@magenta/music')</script>
+    <script src="js/main.js"></script>
+
+    <title>aniline-perpetual</title>
+</head>
+<body class="mdc-typography mdc-theme--primary-bg mdc-theme--on-primary">
+    <div id="root" class="">
+        <div class="mdc-layout-grid">
+            <div class="appHeader">
+                <button id="settings-icon" class="mdc-icon-button">
+                    <span class="material-icons">settings</span>
+                </button>
+                <div id="title" class="center mdc-typography--headline6">aniline</div>
+                <div id="subtitle" class="center mdc-typography--overline">perpetuator</div>
+                <hr>
+                <div class="cc-logo center mdc-typography--subtitle2">...  creativecontrol  ...</div>
+                <div class="version mdc-typography--subtitle2"></div>
+            </div>
+
+            <div id="main-page">
+
+                <div>
+                    <div id="density" class="mdc-slider mdc-slider--discrete" tabindex="0" role="slider" aria-valuemin="0.0" aria-valuemax="100.0" aria-valuenow="90.0"
+                    aria-label="Select density">
+                        <div class="mdc-slider__track-container">
+                            <div class="mdc-slider__track"></div>
+                        </div>
+                        <div class="mdc-slider__thumb-container">
+                            <div class="mdc-slider__pin">
+                                <span class="mdc-slider__pin-value-marker"></span>
+                                </div>
+                            <svg class="mdc-slider__thumb" width="21" height="21">
+                                <circle cx="10.5" cy="10.5" r="7.875"></circle>
+                            </svg>
+                            <div class="mdc-slider__focus-ring"></div>
+                        </div>
+                    </div>
+                    <div class="center">Density</div>
+                </div>
+                </br>
+                <div>
+                    <div id="key-select" class="mdc-select mdc-theme--secondary-bg">
+                        <select id="key" class="mdc-select__native-control" role="presentation">
+                            <option value="C4">C</option>
+                            <option value="G3">G</option>
+                            <option value="D4">D</option>
+                            <option value="A3">A</option>
+                            <option value="E4">E</option>
+                            <option value="B3">B</option>
+                            <option value="F#4">F&sharp;</option>
+                            <option value="C#4">D&flat;</option>
+                            <option value="G#3">A&flat;</option>
+                            <option value="D#4">E&flat;</option>
+                            <option value="A#3">B&flat;</option>
+                            <option value="F4">F</option>
+                        </select>
+                        <label for="key" class="mdc-floating-label mdc-floating-label--float-above"> key </label>
+                    </div>
+                </div>
+                </br>
+                <div>
+                    <div id="mode-select" class="mdc-select mdc-theme--secondary-bg">
+                        <select id="mode" class="mdc-select__native-control" role="presentation">
+                            <option value="0">Ionian</option>
+                            <option value="1">Dorian</option>
+                            <option value="2">Phrygian</option>
+                            <option value="3">Lydian</option>
+                            <option value="4">Mixolydian</option>
+                            <option value="5">Aeolian</option>
+                            <option value="6">Locrian</option>
+                        </select>
+                        <label for="mode" class="mdc-floating-label mdc-floating-label--float-above"> mode </label>
+                    </div>
+                </div>
+                </br>
+                <div class="center">
+                    <button id="clock" class="mdc-icon-button" disabled>
+                        <span class="material-icons clock">track_changes</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="settings-controls" style="display: none;">
+                <div class="center">
+                    <div>
+                      <span class"mdc-typography--headline6"> - Settings - </span>
+                    </div>
+                    <div class="mdc-radio mdc-radio-without-ripple">
+                      <input class="mdc-radio__native-control" type="radio" id="settings-radio-1" name="radios" checked>
+                      <div class="mdc-radio__background">
+                        <div class="mdc-radio__outer-circle"></div>
+                        <div class="mdc-radio__inner-circle"></div>
+                      </div>
+                    </div>
+                    <div class="mdc-radio mdc-radio-without-ripple">
+                      <input class="mdc-radio__native-control" type="radio" id="settings-radio-2" name="radios">
+                      <div class="mdc-radio__background">
+                        <div class="mdc-radio__outer-circle"></div>
+                        <div class="mdc-radio__inner-circle"></div>
+                      </div>
+                    </div>
+                </div>
+            </br>
+            <div id="settings1">
+              <div>
+                  <div id="clock-select" class="mdc-select mdc-theme--secondary-bg">
+                      <select id="midi-clock-inputs" class="mdc-select__native-control" role="presentation"></select>
+                      <label for="midi-clock-inputs" class="mdc-floating-label mdc-floating-label--float-above"> clock input </label>
+                  </div>
+              </div>
+              </br>
+              <div>
+                  <div id="output-select" class="mdc-select mdc-theme--secondary-bg">
+                      <select id="midi-outputs" class="mdc-select__native-control" role="presentation"></select>
+                      <label for="midi-outputs" class="mdc-floating-label mdc-floating-label--float-above"> midi output </label>
+                  </div>
+              </div>
+            </div>
+            <div id="settings2" style="display: none;">
+              <div class="center">
+                  <span class"mdc-typography--headline6">- MIDI CC controls -</span>
+              </div>
+              </br>
+              <div>
+                <div id="densCCField" class="mdc-text-field mdc-theme--secondary-bg narrow-selector">
+                    <input type="number" id="density-cc" class="mdc-text-field__input" min="0" max="127">
+                    <label for="density-cc" class="mdc-floating-label mdc-floating-label--float-above"> density </label>
+                </div>
+              </div>
+              <br>
+              <div id="storage" class="center">
+                  <div id="save" class="mdc-chip" tabindex="0">
+                    <i class="material-icons mdc-chip__icon mdc-chip__icon--leading">save</i>
+                    <div class="mdc-chip__text">save prefs</div>
+                  </div>
+                  <div id="load" class="mdc-chip" tabindex="1">
+                    <i class="material-icons mdc-chip__icon mdc-chip__icon--leading">launch</i>
+                    <div class="mdc-chip__text">load prefs</div>
+                  </div>
+
+              </div>
+            </div>
+          </div>
+</div>
+</div>
+</div>
+</body>
+</html>
